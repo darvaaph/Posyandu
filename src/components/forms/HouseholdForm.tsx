@@ -33,19 +33,26 @@ export function HouseholdForm({ existing }: { existing?: RumahTangga }) {
       : { status: "aktif" },
   });
 
-  const onSubmit = (data: HouseholdInput) => {
+  const onSubmit = async (data: HouseholdInput) => {
     if (store.noRumahExists(data.no_rumah, existing?.id)) {
       notify("Nomor rumah sudah terdaftar", "error");
       return;
     }
-    if (existing) {
-      store.updateHousehold(existing.id, data);
-      notify("Rumah tangga diperbarui", "success");
-      router.push(`/rumah-tangga/${existing.id}`);
-    } else {
-      const rt = store.addHousehold(data);
-      notify("Rumah tangga berhasil ditambahkan", "success");
-      router.push(`/rumah-tangga/${rt.id}`);
+    try {
+      if (existing) {
+        await store.updateHousehold(existing.id, data);
+        notify("Rumah tangga diperbarui", "success");
+        router.push(`/rumah-tangga/${existing.id}`);
+      } else {
+        const rt = await store.addHousehold(data);
+        notify("Rumah tangga berhasil ditambahkan", "success");
+        router.push(`/rumah-tangga/${rt.id}`);
+      }
+    } catch (e) {
+      notify(
+        e instanceof Error ? e.message : "Gagal menyimpan rumah tangga",
+        "error"
+      );
     }
   };
 

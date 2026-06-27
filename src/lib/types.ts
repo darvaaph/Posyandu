@@ -63,6 +63,11 @@ export interface Individu {
   created_at: string;
   // snapshot kategori yang sudah dikonfirmasi kader
   kategori_terkonfirmasi?: KategoriNama | null;
+  // Dihitung di DB (view v_individuals via fungsi Postgres). Undefined pada
+  // baris hasil insert/update langsung — fallback ke perhitungan klien.
+  usia_bulan?: number;
+  kategori_utama?: KategoriNama;
+  kategori_semua?: KategoriNama[];
 }
 
 export interface KategoriResult {

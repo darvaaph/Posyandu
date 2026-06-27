@@ -40,27 +40,34 @@ export default function GenerateLaporanPage() {
     m.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan",
   ]);
 
-  const simpan = () => {
+  const simpan = () =>
     store.addReport({
       judul,
       kategori,
       jumlah_data: members.length,
       periode,
     });
+
+  const handlePDF = async () => {
+    try {
+      await simpan();
+      exportPDF(judul, ["Nama", "NIK", "Usia", "Jenis Kelamin"], rows as string[][]);
+      notify("Laporan dibuat & dicetak", "success");
+      router.push("/laporan");
+    } catch (e) {
+      notify(e instanceof Error ? e.message : "Gagal membuat laporan", "error");
+    }
   };
 
-  const handlePDF = () => {
-    simpan();
-    exportPDF(judul, ["Nama", "NIK", "Usia", "Jenis Kelamin"], rows as string[][]);
-    notify("Laporan dibuat & dicetak", "success");
-    router.push("/laporan");
-  };
-
-  const handleExcel = () => {
-    simpan();
-    exportCSV(judul, [["Nama", "NIK", "Usia", "Jenis Kelamin"], ...rows]);
-    notify("Laporan dibuat & diekspor", "success");
-    router.push("/laporan");
+  const handleExcel = async () => {
+    try {
+      await simpan();
+      exportCSV(judul, [["Nama", "NIK", "Usia", "Jenis Kelamin"], ...rows]);
+      notify("Laporan dibuat & diekspor", "success");
+      router.push("/laporan");
+    } catch (e) {
+      notify(e instanceof Error ? e.message : "Gagal membuat laporan", "error");
+    }
   };
 
   return (

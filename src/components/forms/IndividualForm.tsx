@@ -96,7 +96,7 @@ export function IndividualForm({
     (a) => a.id !== existing?.id && a.jenis_kelamin === "L"
   );
 
-  const onSubmit = (data: IndividualInput) => {
+  const onSubmit = async (data: IndividualInput) => {
     if (store.nikExists(data.nik, existing?.id)) {
       notify("NIK sudah terdaftar untuk warga lain", "error");
       return;
@@ -117,14 +117,21 @@ export function IndividualForm({
       kategori_terkonfirmasi: existing?.kategori_terkonfirmasi ?? null,
     };
 
-    if (existing) {
-      store.updateIndividual(existing.id, payload);
-      notify("Data anggota diperbarui", "success");
-    } else {
-      store.addIndividual(payload);
-      notify("Anggota berhasil ditambahkan", "success");
+    try {
+      if (existing) {
+        await store.updateIndividual(existing.id, payload);
+        notify("Data anggota diperbarui", "success");
+      } else {
+        await store.addIndividual(payload);
+        notify("Anggota berhasil ditambahkan", "success");
+      }
+      router.push(`/rumah-tangga/${rumahTanggaId}`);
+    } catch (e) {
+      notify(
+        e instanceof Error ? e.message : "Gagal menyimpan data anggota",
+        "error"
+      );
     }
-    router.push(`/rumah-tangga/${rumahTanggaId}`);
   };
 
   return (

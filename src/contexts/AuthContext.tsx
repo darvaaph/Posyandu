@@ -8,11 +8,11 @@ import {
   useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
-import { store } from "@/lib/store";
-import { uid } from "@/lib/utils";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
+import { store, mapKader } from "@/lib/store";
+import { useNotification } from "./NotificationContext";
 import type { KaderProfile } from "@/lib/types";
-
-const SESSION_KEY = "sigap_session_v1";
 
 interface AuthState {
   kader: KaderProfile | null;
@@ -30,96 +30,156 @@ interface RegisterPayload {
 interface AuthContextType extends AuthState {
   register: (data: RegisterPayload) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  updateProfile: (patch: Partial<KaderProfile>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+/** Ambil profil kader; buat bila belum ada (dari user_metadata saat register). */
+async function ensureProfile(user: User): Promise<KaderProfile> {
+  const { data: existing, error } = await supabase
+    .from("kader_profiles")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (error) throw error;
+  if (existing) return mapKader(existing);
+
+  const meta = (user.user_metadata ?? {}) as Record<string, string>;
+  const { data, error: insertError } = await supabase
+    .from("kader_profiles")
+    .insert({
+      user_id: user.id,
+      email: user.email,
+      nama_kader: meta.nama_kader || "Kader",
+      nama_posyandu: meta.nama_posyandu || "Posyandu",
+      wilayah: meta.wilayah || "-",
+    })
+    .select()
+    .single();
+  if (insertError) throw insertError;
+  return mapKader(data);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const { notify } = useNotification();
   const [state, setState] = useState<AuthState>({
     kader: null,
     isLoading: true,
   });
 
-  // Restore session on mount
+  // Restore session + load data on mount
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(SESSION_KEY);
-      if (raw) {
-        const kader = JSON.parse(raw) as KaderProfile;
-        store.setKader(kader);
-        setState({ kader, isLoading: false });
-        return;
+    let active = true;
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const user = data.session?.user;
+        if (user) {
+          const kader = await ensureProfile(user);
+          store.setKader(kader);
+          await store.loadAll();
+          store.startRealtime();
+          if (active) setState({ kader, isLoading: false });
+          return;
+        }
+      } catch (e) {
+        console.error("[auth] restore gagal", e);
       }
-    } catch {
-      /* ignore */
-    }
-    setState({ kader: null, isLoading: false });
+      if (active) setState({ kader: null, isLoading: false });
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const persistSession = (kader: KaderProfile | null) => {
-    if (kader) {
-      window.localStorage.setItem(SESSION_KEY, JSON.stringify(kader));
-    } else {
-      window.localStorage.removeItem(SESSION_KEY);
-    }
-  };
-
-  const register = useCallback(
-    async (data: RegisterPayload) => {
-      // Frontend-only: create a local kader profile
-      const kader: KaderProfile = {
-        id: uid("kader_"),
-        nama_kader: data.nama_kader,
-        nama_posyandu: data.nama_posyandu,
-        wilayah: data.wilayah,
-        email: data.email,
-        created_at: new Date().toISOString(),
-      };
+  const bootstrap = useCallback(
+    async (user: User) => {
+      const kader = await ensureProfile(user);
       store.setKader(kader);
-      persistSession(kader);
+      await store.loadAll();
+      store.startRealtime();
       setState({ kader, isLoading: false });
       router.push("/dashboard");
     },
     [router]
+  );
+
+  const register = useCallback(
+    async (payload: RegisterPayload) => {
+      const { data, error } = await supabase.auth.signUp({
+        email: payload.email,
+        password: payload.password,
+        options: {
+          data: {
+            nama_kader: payload.nama_kader,
+            nama_posyandu: payload.nama_posyandu,
+            wilayah: payload.wilayah,
+          },
+        },
+      });
+      if (error) throw new Error(errMsg(error, "Registrasi gagal"));
+
+      if (!data.session) {
+        // Konfirmasi email aktif — profil dibuat saat login pertama
+        notify(
+          "Registrasi berhasil. Cek email Anda untuk konfirmasi, lalu login.",
+          "info"
+        );
+        router.push("/login");
+        return;
+      }
+      await bootstrap(data.user!);
+      notify("Akun berhasil dibuat", "success");
+    },
+    [bootstrap, notify, router]
   );
 
   const login = useCallback(
-    async (email: string, _password: string) => {
-      // Frontend-only: accept any credentials, reuse existing kader if present
-      const existing = store.getSnapshot().kader;
-      const kader: KaderProfile =
-        existing && existing.email === email
-          ? existing
-          : {
-              id: uid("kader_"),
-              nama_kader: existing?.nama_kader ?? "Kader Posyandu",
-              nama_posyandu: existing?.nama_posyandu ?? "Posyandu Melati",
-              wilayah: existing?.wilayah ?? "Desa Sukamaju",
-              email,
-              created_at: new Date().toISOString(),
-            };
-      store.setKader(kader);
-      persistSession(kader);
-      setState({ kader, isLoading: false });
-      router.push("/dashboard");
+    async (email: string, password: string) => {
+      // Lempar error agar form bisa menampilkannya inline (lihat LoginForm).
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw new Error(errMsg(error, "Email atau password salah"));
+      await bootstrap(data.user);
     },
-    [router]
+    [bootstrap]
   );
 
-  const logout = useCallback(() => {
-    persistSession(null);
-    store.setKader(null);
+  const logout = useCallback(async () => {
+    store.stopRealtime();
+    await supabase.auth.signOut();
+    store.clear();
     setState({ kader: null, isLoading: false });
     router.push("/login");
   }, [router]);
 
+  const updateProfile = useCallback(
+    async (patch: Partial<KaderProfile>) => {
+      const kader = await store.updateKader(patch);
+      setState((s) => ({ ...s, kader }));
+    },
+    []
+  );
+
   return (
-    <AuthContext.Provider value={{ ...state, register, login, logout }}>
+    <AuthContext.Provider
+      value={{ ...state, register, login, logout, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );
+}
+
+function errMsg(e: unknown, fallback: string): string {
+  if (e && typeof e === "object" && "message" in e) {
+    return String((e as { message: string }).message) || fallback;
+  }
+  return fallback;
 }
 
 export function useAuth() {

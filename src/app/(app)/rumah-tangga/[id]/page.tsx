@@ -149,10 +149,14 @@ export default function RumahTanggaDetailPage() {
       <ConfirmDeleteDialog
         open={deleteHouseOpen}
         onClose={() => setDeleteHouseOpen(false)}
-        onConfirm={() => {
-          store.deleteHousehold(rt.id);
-          notify("Rumah tangga dihapus", "success");
-          router.push("/rumah-tangga");
+        onConfirm={async () => {
+          try {
+            await store.deleteHousehold(rt.id);
+            notify("Rumah tangga dihapus", "success");
+            router.push("/rumah-tangga");
+          } catch (e) {
+            notify(e instanceof Error ? e.message : "Gagal menghapus", "error");
+          }
         }}
         title="Hapus rumah tangga?"
         description="Seluruh anggota di rumah tangga ini juga akan dihapus."
@@ -161,10 +165,14 @@ export default function RumahTanggaDetailPage() {
       <ConfirmDeleteDialog
         open={deleteAnggotaId !== null}
         onClose={() => setDeleteAnggotaId(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (deleteAnggotaId) {
-            store.deleteIndividual(deleteAnggotaId);
-            notify("Anggota dihapus", "success");
+            try {
+              await store.deleteIndividual(deleteAnggotaId);
+              notify("Anggota dihapus", "success");
+            } catch (e) {
+              notify(e instanceof Error ? e.message : "Gagal menghapus", "error");
+            }
           }
         }}
         title="Hapus anggota?"

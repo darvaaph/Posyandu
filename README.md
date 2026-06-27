@@ -1,13 +1,31 @@
 # SIGAP Posyandu — Frontend
 
-Frontend-only implementation berdasarkan [PRD.md](PRD.md). Dibangun dengan
+Implementasi berdasarkan [PRD.md](PRD.md). Dibangun dengan
 **Next.js 14 (App Router) + TypeScript + Tailwind CSS**, dengan UI bergaya
-shadcn yang ditulis tangan.
+shadcn yang ditulis tangan, dan **Supabase** (Auth + PostgreSQL) sebagai backend.
 
-> **Catatan:** Versi ini *frontend-only*. Tidak ada Supabase / API routes —
-> seluruh data disimpan di **localStorage** browser melalui mock store
-> (`src/lib/store.ts`). Logika domain (kategorisasi, hitung usia) berjalan
-> penuh di sisi klien, sesuai cerminan logika backend di PRD.
+> **Data layer:** Seluruh akses data lewat `src/lib/store.ts` — cache di memori
+> + pub/sub yang menulis ke Supabase. Auth (login/register/session) lewat
+> `src/contexts/AuthContext.tsx` menggunakan Supabase Auth. RLS membatasi tiap
+> kader hanya melihat datanya sendiri. Logika domain (kategorisasi, hitung usia)
+> tetap berjalan di sisi klien.
+
+## Setup Supabase
+
+1. Isi `.env.local` (lihat `.env.example`) dengan URL + anon key dari
+   Supabase Studio → Settings → API.
+2. Jalankan `supabase/schema.sql` di SQL Editor (tabel + RLS, termasuk INSERT
+   policy `kader_profiles` yang dibutuhkan registrasi).
+3. Jalankan `supabase/functions.sql` (fungsi kategorisasi + view `v_individuals`
+   + daftarkan tabel ke Realtime). Opsional tapi mengaktifkan kategori-di-DB &
+   realtime; app tetap jalan tanpa ini (fallback ke perhitungan klien).
+4. Untuk testing cepat: Auth → Providers → Email → matikan **Confirm email**
+   agar register langsung login.
+
+**Realtime:** setelah login, app berlangganan perubahan tabel dan me-reload data
+otomatis (debounced) — buka 2 tab untuk melihat sinkron. **Kategorisasi:** logika
+ada di `src/lib/kategorisasi.ts` (klien, untuk preview saat mengetik) dan
+dicerminkan di `supabase/functions.sql` (DB, sumber kebenaran saat data dibaca).
 
 ## Menjalankan
 

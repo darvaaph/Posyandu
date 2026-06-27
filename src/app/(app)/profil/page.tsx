@@ -1,17 +1,15 @@
 "use client";
 
-import { RotateCcw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { store } from "@/lib/store";
-import { useNotification } from "@/contexts/NotificationContext";
 import { ProfileForm } from "@/components/forms/ProfileForm";
+import { SeedDataCard } from "@/components/dev/SeedDataCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/common/Common";
+
+const isDev = process.env.NEXT_PUBLIC_APP_ENV !== "production";
 
 export default function ProfilPage() {
   const { kader } = useAuth();
-  const { notify } = useNotification();
 
   if (!kader) return <LoadingSpinner />;
 
@@ -38,26 +36,7 @@ export default function ProfilPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="flex items-center justify-between pt-5">
-          <div>
-            <p className="text-sm font-medium">Data Contoh</p>
-            <p className="text-xs text-muted-foreground">
-              Kembalikan data warga ke contoh awal (demo).
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              store.resetSeed();
-              notify("Data contoh dipulihkan", "success");
-            }}
-          >
-            <RotateCcw className="h-4 w-4" /> Reset
-          </Button>
-        </CardContent>
-      </Card>
+      {isDev && <SeedDataCard />}
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { store } from "@/lib/store";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/contexts/NotificationContext";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,8 @@ import type { KaderProfile } from "@/lib/types";
 
 export function ProfileForm({ kader }: { kader: KaderProfile }) {
   const { notify } = useNotification();
-  const { logout } = useAuth();
+  const { logout, updateProfile } = useAuth();
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     nama_kader: kader.nama_kader,
     nama_posyandu: kader.nama_posyandu,
@@ -21,14 +21,16 @@ export function ProfileForm({ kader }: { kader: KaderProfile }) {
   const update = (key: keyof typeof form, value: string) =>
     setForm((f) => ({ ...f, [key]: value }));
 
-  const onSave = () => {
-    store.updateKader(form);
-    // sinkronkan session
-    window.localStorage.setItem(
-      "sigap_session_v1",
-      JSON.stringify({ ...kader, ...form })
-    );
-    notify("Profil diperbarui", "success");
+  const onSave = async () => {
+    setSaving(true);
+    try {
+      await updateProfile(form);
+      notify("Profil diperbarui", "success");
+    } catch (e) {
+      notify(e instanceof Error ? e.message : "Gagal menyimpan profil", "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -49,8 +51,8 @@ export function ProfileForm({ kader }: { kader: KaderProfile }) {
         <Label>Email</Label>
         <Input value={form.email} onChange={(e) => update("email", e.target.value)} />
       </div>
-      <Button onClick={onSave} className="w-full">
-        Simpan Profil
+      <Button onClick={onSave} disabled={saving} className="w-full">
+        {saving ? "Menyimpan..." : "Simpan Profil"}
       </Button>
       <Button variant="outline" onClick={logout} className="w-full">
         Keluar

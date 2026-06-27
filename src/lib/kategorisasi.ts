@@ -91,8 +91,18 @@ export function tentukanKategori(params: {
   };
 }
 
-/** Versi yang menerima sebuah objek Individu lengkap. */
+/**
+ * Versi yang menerima sebuah objek Individu lengkap.
+ * Memakai hasil hitungan DB (view v_individuals) bila tersedia, agar konsisten
+ * dengan sumber kebenaran di Postgres; jatuh ke perhitungan klien bila tidak.
+ */
 export function kategoriIndividu(ind: Individu): KategoriResult {
+  if (ind.kategori_utama && ind.kategori_semua && ind.kategori_semua.length) {
+    return {
+      kategori_utama: ind.kategori_utama,
+      semua_kategori: ind.kategori_semua,
+    };
+  }
   return tentukanKategori({
     tanggal_lahir: ind.tanggal_lahir,
     jenis_kelamin: ind.jenis_kelamin,

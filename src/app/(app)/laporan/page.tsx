@@ -107,10 +107,14 @@ export default function LaporanPage() {
       <ConfirmDeleteDialog
         open={deleteId !== null}
         onClose={() => setDeleteId(null)}
-        onConfirm={() => {
+        onConfirm={async () => {
           if (deleteId) {
-            store.deleteReport(deleteId);
-            notify("Laporan dihapus", "success");
+            try {
+              await store.deleteReport(deleteId);
+              notify("Laporan dihapus", "success");
+            } catch (e) {
+              notify(e instanceof Error ? e.message : "Gagal menghapus", "error");
+            }
           }
         }}
         title="Hapus laporan?"

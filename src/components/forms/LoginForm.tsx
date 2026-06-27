@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -10,20 +11,32 @@ import { Input, Label, FieldError } from "@/components/ui/input";
 
 export function LoginForm() {
   const { login } = useAuth();
+  const [authError, setAuthError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginInput>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: { email: "kader@posyandu.id", password: "123456" },
+    defaultValues: { email: "", password: "" },
   });
 
+  const onSubmit = async (d: LoginInput) => {
+    setAuthError(null);
+    try {
+      await login(d.email, d.password);
+    } catch (e) {
+      setAuthError(e instanceof Error ? e.message : "Gagal masuk");
+    }
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit((d) => login(d.email, d.password))}
-      className="space-y-4"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {authError && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {authError}
+        </div>
+      )}
       <div>
         <Label>Email</Label>
         <Input type="email" placeholder="email@posyandu.id" {...register("email")} />

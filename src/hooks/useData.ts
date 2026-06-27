@@ -3,25 +3,17 @@
 import { useSyncExternalStore } from "react";
 import { store, type Database } from "@/lib/store";
 
-const EMPTY: Database = {
-  kader: null,
-  households: [],
-  individuals: [],
-  reports: [],
-};
-
-/** Subscribe to the whole mock database (re-renders on any mutation). */
+/** Subscribe to the whole database cache (re-renders on any mutation). */
 export function useDatabase(): Database {
   return useSyncExternalStore(
     store.subscribe,
-    () => store.getSnapshot(),
-    () => EMPTY // server snapshot (avoids hydration access to localStorage)
+    store.getSnapshot,
+    store.getServerSnapshot
   );
 }
 
 export function useHouseholds() {
-  const db = useDatabase();
-  return db.households;
+  return useDatabase().households;
 }
 
 export function useIndividuals(rumahTanggaId?: string) {
@@ -32,6 +24,5 @@ export function useIndividuals(rumahTanggaId?: string) {
 }
 
 export function useReports() {
-  const db = useDatabase();
-  return db.reports;
+  return useDatabase().reports;
 }

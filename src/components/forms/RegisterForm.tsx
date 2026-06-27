@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -10,6 +11,7 @@ import { Input, Label, FieldError } from "@/components/ui/input";
 
 export function RegisterForm() {
   const { register: registerKader } = useAuth();
+  const [authError, setAuthError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -18,8 +20,22 @@ export function RegisterForm() {
     resolver: zodResolver(RegisterSchema),
   });
 
+  const onSubmit = async (d: RegisterInput) => {
+    setAuthError(null);
+    try {
+      await registerKader(d);
+    } catch (e) {
+      setAuthError(e instanceof Error ? e.message : "Registrasi gagal");
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit((d) => registerKader(d))} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {authError && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {authError}
+        </div>
+      )}
       <div>
         <Label>Nama Kader</Label>
         <Input placeholder="Nama lengkap" {...register("nama_kader")} />

@@ -14,20 +14,30 @@ export default function TinjauanPage() {
   const reviews = useReviews();
   const { notify } = useNotification();
 
-  const konfirmasi = (individuId: string, kategoriBaru: string) => {
-    store.updateIndividual(individuId, {
-      kategori_terkonfirmasi: kategoriBaru as never,
-    });
-    notify("Kategori dikonfirmasi", "success");
+  const konfirmasi = async (individuId: string, kategoriBaru: string) => {
+    try {
+      await store.updateIndividual(individuId, {
+        kategori_terkonfirmasi: kategoriBaru as never,
+      });
+      notify("Kategori dikonfirmasi", "success");
+    } catch (e) {
+      notify(e instanceof Error ? e.message : "Gagal konfirmasi", "error");
+    }
   };
 
-  const konfirmasiSemua = () => {
-    reviews.forEach((r) =>
-      store.updateIndividual(r.individu_id, {
-        kategori_terkonfirmasi: r.kategori_baru as never,
-      })
-    );
-    notify(`${reviews.length} warga dikonfirmasi`, "success");
+  const konfirmasiSemua = async () => {
+    try {
+      await Promise.all(
+        reviews.map((r) =>
+          store.updateIndividual(r.individu_id, {
+            kategori_terkonfirmasi: r.kategori_baru as never,
+          })
+        )
+      );
+      notify(`${reviews.length} warga dikonfirmasi`, "success");
+    } catch (e) {
+      notify(e instanceof Error ? e.message : "Gagal konfirmasi", "error");
+    }
   };
 
   return (
