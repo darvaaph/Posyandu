@@ -6,6 +6,14 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 export const metadata: Metadata = {
   title: "SIGAP Posyandu",
   description: "Sistem Informasi Gizi & Pencatatan Posyandu",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SIGAP",
+  },
+  icons: {
+    apple: "/icons/icon-192.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -25,6 +33,11 @@ export default function RootLayout({
         <NotificationProvider>
           <AuthProvider>{children}</AuthProvider>
         </NotificationProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}))}`,
+          }}
+        />
       </body>
     </html>
   );

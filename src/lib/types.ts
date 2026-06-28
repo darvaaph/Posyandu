@@ -81,7 +81,7 @@ export interface Review {
   nama: string;
   usia_display: string;
   kategori_lama: KategoriNama | null;
-  kategori_baru: KategoriNama;
+  kategori_baru: KategoriNama | undefined;
 }
 
 export interface Laporan {

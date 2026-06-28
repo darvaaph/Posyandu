@@ -10,6 +10,18 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/common/Common";
 import { KategoriBadge } from "@/components/cards/KategoriCard";
 import { ArrowRight } from "lucide-react";
+import type { KategoriNama } from "@/lib/types";
+
+function BadgeKategori({ nama }: { nama: KategoriNama | undefined | null }) {
+  if (!nama) {
+    return (
+      <span className="rounded-full bg-muted px-2.5 py-0.5 text-muted-foreground">
+        Baru
+      </span>
+    );
+  }
+  return <KategoriBadge nama={nama} />;
+}
 
 export default function TinjauanPage() {
   const reviews = useReviews();
@@ -20,10 +32,10 @@ export default function TinjauanPage() {
   const sudahKonfirmasi = totalAktif - reviews.length;
   const persen = totalAktif > 0 ? Math.round((sudahKonfirmasi / totalAktif) * 100) : 100;
 
-  const konfirmasi = async (individuId: string, kategoriBaru: string) => {
+  const konfirmasi = async (individuId: string, kategoriBaru: KategoriNama | undefined) => {
     try {
       await store.updateIndividual(individuId, {
-        kategori_terkonfirmasi: kategoriBaru as never,
+        kategori_terkonfirmasi: (kategoriBaru ?? null) as never,
       });
       notify("Kategori dikonfirmasi", "success");
     } catch (e) {
@@ -36,7 +48,7 @@ export default function TinjauanPage() {
       await Promise.all(
         reviews.map((r) =>
           store.updateIndividual(r.individu_id, {
-            kategori_terkonfirmasi: r.kategori_baru as never,
+            kategori_terkonfirmasi: (r.kategori_baru ?? null) as never,
           })
         )
       );
@@ -92,15 +104,15 @@ export default function TinjauanPage() {
                 <p className="font-medium">{r.nama}</p>
                 <p className="text-xs text-muted-foreground">{r.usia_display}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
-                  {r.kategori_lama ? (
-                    <KategoriBadge nama={r.kategori_lama} />
+                  <BadgeKategori nama={r.kategori_lama} />
+                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                  {r.kategori_baru ? (
+                    <KategoriBadge nama={r.kategori_baru} />
                   ) : (
-                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-muted-foreground">
-                      Baru
+                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-slate-500">
+                      Tidak ada kategori sasaran
                     </span>
                   )}
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-                  <KategoriBadge nama={r.kategori_baru} />
                 </div>
               </div>
               <Button

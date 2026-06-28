@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#16a34a"/>
+  <!-- Plus / cross medis -->
+  <rect x="204" y="112" width="104" height="288" rx="24" fill="white"/>
+  <rect x="112" y="204" width="288" height="104" rx="24" fill="white"/>
+</svg>
