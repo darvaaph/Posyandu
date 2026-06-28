@@ -55,17 +55,15 @@ BEGIN
     IF status_hamil THEN
       cats := array_append(cats, 'Ibu Hamil');
     END IF;
-    IF punya_pasangan THEN
-      cats := array_append(cats, 'PUS');
-    END IF;
   END IF;
 
-  -- Fallback: bila tak masuk kelompok mana pun, beri label utama
-  -- (mencerminkan perilaku klien: semua_kategori = [kategori_utama]).
-  IF array_length(cats, 1) IS NULL THEN
-    cats := ARRAY[ CASE WHEN y >= 60 THEN 'Lansia' ELSE 'WUS' END ];
+  -- PUS: Pasangan Usia Subur — suami/istri yang punya pasangan & usia 15..49.
+  -- (Suami masuk PUS tapi TIDAK masuk WUS.)
+  IF punya_pasangan AND y >= 15 AND y <= 49 THEN
+    cats := array_append(cats, 'PUS');
   END IF;
 
+  -- Warga di luar kelompok sasaran (pria dewasa 19-59, anak 5-9) tidak diberi label.
   RETURN cats;
 END;
 $$;

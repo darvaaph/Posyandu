@@ -114,7 +114,9 @@ export default function RumahTanggaDetailPage() {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium">{a.nama}</p>
-                      <KategoriBadge nama={kat.kategori_utama} />
+                      {kat.semua_kategori.map((nama) => (
+                        <KategoriBadge key={nama} nama={nama} />
+                      ))}
                       {a.status !== "aktif" && (
                         <Badge className="bg-slate-100 text-slate-600">{a.status}</Badge>
                       )}

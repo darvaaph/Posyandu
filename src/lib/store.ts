@@ -315,11 +315,14 @@ export const store = {
       created.push(await this.addIndividual({ ...m, rumah_tangga_id: rt.id }));
     }
     const kepala = created.find((c) => c.peran_dalam_kk === "kepala_keluarga");
-    if (kepala) {
-      for (const c of created) {
-        if (c.peran_dalam_kk === "istri" && !c.pasangan_id) {
-          await this.updateIndividual(c.id, { pasangan_id: kepala.id });
-        }
+    const istri = created.find((c) => c.peran_dalam_kk === "istri");
+    if (kepala && istri) {
+      // Tautkan pasangan DUA ARAH agar keduanya terdeteksi PUS.
+      if (!istri.pasangan_id) {
+        await this.updateIndividual(istri.id, { pasangan_id: kepala.id });
+      }
+      if (!kepala.pasangan_id) {
+        await this.updateIndividual(kepala.id, { pasangan_id: istri.id });
       }
     }
     return rt;
@@ -423,7 +426,7 @@ export const store = {
     const rt1 = await this.addHousehold({
       no_rumah: "001",
       alamat: "Jl. Melati No. 12",
-      dusun: "Dusun Krajan",
+      dusun: "Desa Krajan",
       rt: "002",
       rw: "001",
       nama_kepala_keluarga: "Budi Santoso",
@@ -432,7 +435,7 @@ export const store = {
     const rt2 = await this.addHousehold({
       no_rumah: "002",
       alamat: "Jl. Mawar No. 5",
-      dusun: "Dusun Krajan",
+      dusun: "Desa Krajan",
       rt: "002",
       rw: "001",
       nama_kepala_keluarga: "Slamet Riyadi",
@@ -450,7 +453,7 @@ export const store = {
       status_hamil: false,
       status: "aktif",
     });
-    await this.addIndividual({
+    const siti = await this.addIndividual({
       rumah_tangga_id: rt1.id,
       nama: "Siti Aminah",
       nik: "3201014104850002",
@@ -463,6 +466,8 @@ export const store = {
       pasangan_id: budi.id,
       status: "aktif",
     });
+    // Tautkan balik suami→istri agar Budi terdeteksi PUS.
+    await this.updateIndividual(budi.id, { pasangan_id: siti.id });
     await this.addIndividual({
       rumah_tangga_id: rt1.id,
       nama: "Putri Santoso",
@@ -497,7 +502,7 @@ export const store = {
       status_hamil: false,
       status: "aktif",
     });
-    await this.addIndividual({
+    const wati = await this.addIndividual({
       rumah_tangga_id: rt2.id,
       nama: "Wati Lestari",
       nik: "3201014104900006",
@@ -509,6 +514,7 @@ export const store = {
       pasangan_id: slamet.id,
       status: "aktif",
     });
+    await this.updateIndividual(slamet.id, { pasangan_id: wati.id });
     await this.addIndividual({
       rumah_tangga_id: rt2.id,
       nama: "Bayu Lestari",

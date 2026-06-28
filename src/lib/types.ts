@@ -72,7 +72,7 @@ export interface Individu {
 }
 
 export interface KategoriResult {
-  kategori_utama: KategoriNama;
+  kategori_utama: KategoriNama | undefined;
   semua_kategori: KategoriNama[];
 }
 

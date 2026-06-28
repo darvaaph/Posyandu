@@ -94,7 +94,7 @@ export function HouseholdForm({ existing }: { existing?: RumahTangga }) {
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <Label>Dusun</Label>
+          <Label>Desa</Label>
           <Input {...register("dusun")} />
         </div>
         <div>

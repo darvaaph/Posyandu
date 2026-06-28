@@ -185,11 +185,17 @@ export function IndividualForm({
         <div className="flex flex-wrap items-center gap-2 rounded-lg bg-primary/10 px-4 py-3 text-sm">
           <span className="font-medium">{usiaDisplay(tanggalLahir)}</span>
           <span className="text-muted-foreground">— Kategori:</span>
-          <KategoriBadge nama={preview.kategori_utama} />
-          {preview.semua_kategori.length > 1 && (
-            <span className="text-xs text-muted-foreground">
-              (+{preview.semua_kategori.length - 1} lainnya)
-            </span>
+          {preview.kategori_utama ? (
+            <>
+              <KategoriBadge nama={preview.kategori_utama} />
+              {preview.semua_kategori.length > 1 && (
+                <span className="text-xs text-muted-foreground">
+                  (+{preview.semua_kategori.length - 1} lainnya)
+                </span>
+              )}
+            </>
+          ) : (
+            <span className="text-xs italic text-muted-foreground">Tidak ada kategori Posyandu</span>
           )}
         </div>
       )}

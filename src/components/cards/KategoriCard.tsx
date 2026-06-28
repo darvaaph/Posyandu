@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 export const KategoriBadge = memo(function KategoriBadge({
   nama,
 }: {
-  nama: KategoriNama;
+  nama: KategoriNama | undefined | null;
 }) {
+  if (!nama) return null;
   const meta = KATEGORI_META[nama];
   return (
     <Badge className={meta.color}>

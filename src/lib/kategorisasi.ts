@@ -53,10 +53,12 @@ export function tentukanKategori(params: {
     if (status_hamil) {
       kategori.push("Ibu Hamil");
     }
-    // PUS: WUS yang memiliki pasangan
-    if (punya_pasangan) {
-      kategori.push("PUS");
-    }
+  }
+
+  // PUS: Pasangan Usia Subur — siapa pun (suami/istri) yang memiliki pasangan
+  // dan berusia subur 15–49. Suami masuk PUS tapi TIDAK masuk WUS.
+  if (punya_pasangan && tahun >= 15 && tahun <= 49) {
+    kategori.push("PUS");
   }
 
   // Tentukan kategori utama berdasarkan prioritas
@@ -79,15 +81,10 @@ export function tentukanKategori(params: {
     }
   }
 
-  // Fallback: usia dewasa di luar kelompok di atas
-  if (!utama) {
-    utama = tahun >= 60 ? "Lansia" : "WUS";
-    if (!kategori.includes(utama) && jenis_kelamin === "P") kategori.push(utama);
-  }
-
+  // Warga dewasa di luar sasaran (pria 19-59, anak 5-9) tidak punya label Posyandu.
   return {
     kategori_utama: utama,
-    semua_kategori: kategori.length ? kategori : [utama],
+    semua_kategori: kategori,
   };
 }
 

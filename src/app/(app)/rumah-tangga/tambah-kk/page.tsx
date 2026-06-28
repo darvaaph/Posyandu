@@ -10,6 +10,7 @@ import { KK_REVIEW_KEY } from "@/lib/extractKK";
 import {
   toReviewAnggota,
   nikTanggalTidakCocok,
+  tanggalDariNIK,
   type ReviewAnggota,
 } from "@/lib/kk-mapping";
 import type { KKExtraction } from "@/lib/kk-schema";
@@ -38,6 +39,12 @@ const emptyAnggota: ReviewAnggota = {
   peran_dalam_kk: "anggota_lain",
   hubungan_asli: "",
 };
+
+const BULAN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+function formatTanggal(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${d} ${BULAN[m - 1]} ${y}`;
+}
 
 export default function ReviewKKPage() {
   const router = useRouter();
@@ -219,7 +226,7 @@ export default function ReviewKKPage() {
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label>Dusun</Label>
+              <Label>Desa</Label>
               <Input value={house.dusun} onChange={(e) => setH("dusun", e.target.value)} />
             </div>
             <div>
@@ -306,12 +313,31 @@ export default function ReviewKKPage() {
                     ))}
                   </Select>
                 </div>
-                {mismatch && (
-                  <div className="flex items-center gap-1.5 text-xs text-amber-600">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    Tanggal lahir tidak cocok dengan NIK — periksa lagi.
-                  </div>
-                )}
+                {mismatch && (() => {
+                  const nikDate = tanggalDariNIK(a.nik);
+                  return (
+                    <div className="flex flex-wrap items-center gap-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span className="flex-1">
+                        Tanggal lahir tidak cocok dengan NIK.
+                        {nikDate && (
+                          <> Saran dari NIK:{" "}
+                            <strong>{formatTanggal(nikDate)}</strong>.
+                          </>
+                        )}
+                      </span>
+                      {nikDate && (
+                        <button
+                          type="button"
+                          className="shrink-0 font-medium underline hover:no-underline"
+                          onClick={() => setA(i, { tanggal_lahir: nikDate })}
+                        >
+                          Pakai
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
               </CardContent>
             </Card>
           );
