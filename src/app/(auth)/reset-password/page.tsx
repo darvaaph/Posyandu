@@ -17,27 +17,29 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Supabase mendeteksi token recovery dari URL fragment secara otomatis
-    // dan menembakkan event PASSWORD_RECOVERY melalui onAuthStateChange.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setStage("form");
-      }
-    });
+    // Supabase menaruh token di URL hash (#access_token=...&type=recovery).
+    // Kita baca dan tukarkan secara eksplisit agar tidak bergantung pada
+    // timing onAuthStateChange yang bisa lambat di Next.js App Router.
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const type = params.get("type");
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token") ?? "";
 
-    // Fallback: jika halaman dimuat ulang setelah sesi recovery aktif
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setStage("form");
-      } else {
-        // Beri waktu singkat untuk event onAuthStateChange muncul
-        setTimeout(() => {
-          setStage((s) => (s === "loading" ? "invalid" : s));
-        }, 2000);
-      }
-    });
+    if (type !== "recovery" || !accessToken) {
+      setStage("invalid");
+      return;
+    }
 
-    return () => subscription.unsubscribe();
+    supabase.auth
+      .setSession({ access_token: accessToken, refresh_token: refreshToken })
+      .then(({ data, error }) => {
+        if (error || !data.session) {
+          setStage("invalid");
+        } else {
+          setStage("form");
+        }
+      });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,6 +59,8 @@ export default function ResetPasswordPage() {
     try {
       const { error: err } = await supabase.auth.updateUser({ password });
       if (err) throw err;
+      // Keluar dari sesi recovery setelah berhasil
+      await supabase.auth.signOut();
       setStage("success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memperbarui password.");
