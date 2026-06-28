@@ -152,7 +152,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Validasi & normalisasi hasil; tetap kirim best-effort jika sebagian tak cocok
-    const parsedJson = JSON.parse(text);
+    let parsedJson: unknown;
+    try {
+      parsedJson = JSON.parse(text);
+    } catch {
+      return NextResponse.json(
+        { error: "Gemini mengembalikan format tidak terbaca. Coba foto yang lebih jelas." },
+        { status: 422 }
+      );
+    }
     const result = KKExtractionSchema.safeParse(parsedJson);
     const data = result.success ? result.data : parsedJson;
 

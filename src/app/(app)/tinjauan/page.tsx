@@ -35,7 +35,7 @@ export default function TinjauanPage() {
   const konfirmasi = async (individuId: string, kategoriBaru: KategoriNama | undefined) => {
     try {
       await store.updateIndividual(individuId, {
-        kategori_terkonfirmasi: (kategoriBaru ?? null) as never,
+        kategori_terkonfirmasi: kategoriBaru ?? null,
       });
       notify("Kategori dikonfirmasi", "success");
     } catch (e) {
@@ -48,7 +48,7 @@ export default function TinjauanPage() {
       await Promise.all(
         reviews.map((r) =>
           store.updateIndividual(r.individu_id, {
-            kategori_terkonfirmasi: (r.kategori_baru ?? null) as never,
+            kategori_terkonfirmasi: r.kategori_baru ?? null,
           })
         )
       );

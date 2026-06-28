@@ -41,8 +41,14 @@ export default function RumahTanggaPage() {
     });
   }, [db.households, q, filterDesa, filterRT]);
 
-  const countAnggota = (rtId: string) =>
-    db.individuals.filter((i) => i.rumah_tangga_id === rtId).length;
+  // Hitung jumlah anggota per RT dalam satu pass (O(n)) bukan per-kartu (O(n²)).
+  const countMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const i of db.individuals) {
+      m[i.rumah_tangga_id] = (m[i.rumah_tangga_id] ?? 0) + 1;
+    }
+    return m;
+  }, [db.individuals]);
 
   const hasFilter = filterDesa || filterRT;
 
@@ -159,7 +165,7 @@ export default function RumahTanggaPage() {
                   </p>
                 </div>
                 <Badge className="bg-accent text-accent-foreground">
-                  {countAnggota(h.id)} anggota
+                  {countMap[h.id] ?? 0} anggota
                 </Badge>
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </Card>

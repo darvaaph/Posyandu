@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useSyncExternalStore } from "react";
 import { store, type Database } from "@/lib/store";
 
@@ -18,9 +19,14 @@ export function useHouseholds() {
 
 export function useIndividuals(rumahTanggaId?: string) {
   const db = useDatabase();
-  return rumahTanggaId
-    ? db.individuals.filter((i) => i.rumah_tangga_id === rumahTanggaId)
-    : db.individuals;
+  // useMemo mencegah re-filter saat bagian lain cache berubah (mis. households update).
+  return useMemo(
+    () =>
+      rumahTanggaId
+        ? db.individuals.filter((i) => i.rumah_tangga_id === rumahTanggaId)
+        : db.individuals,
+    [db.individuals, rumahTanggaId]
+  );
 }
 
 export function useReports() {

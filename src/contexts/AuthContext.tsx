@@ -92,6 +92,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })();
     return () => {
       active = false;
+      // Hentikan realtime jika komponen unmount (mis. hot-reload StrictMode).
+      store.stopRealtime();
     };
   }, []);
 
@@ -151,9 +153,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
+    // Bersihkan cache dulu agar event realtime terakhir tidak mengisi ulang state.
+    store.clear();
     store.stopRealtime();
     await supabase.auth.signOut();
-    store.clear();
     setState({ kader: null, isLoading: false });
     router.push("/login");
   }, [router]);

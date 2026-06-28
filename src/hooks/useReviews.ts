@@ -3,7 +3,7 @@
 import { useDatabase } from "./useData";
 import { kategoriIndividu } from "@/lib/kategorisasi";
 import { usiaDisplay } from "@/lib/date";
-import type { Review } from "@/lib/types";
+import type { Individu, Review } from "@/lib/types";
 
 /**
  * Tinjauan bulanan: warga aktif yang kategori terkininya berbeda dari
@@ -15,25 +15,24 @@ import type { Review } from "@/lib/types";
 export function useReviews(): Review[] {
   const db = useDatabase();
 
-  return db.individuals
-    .filter((i) => i.status === "aktif")
-    .map((ind) => {
-      const { kategori_utama } = kategoriIndividu(ind);
-      const lama = ind.kategori_terkonfirmasi ?? null;
+  // Satu pass: filter + map + filter null digabung menjadi reduce agar
+  // tidak membuat array perantara yang tidak dipakai.
+  return db.individuals.reduce<Review[]>((acc, ind: Individu) => {
+    if (ind.status !== "aktif") return acc;
 
-      // Tidak ada perubahan
-      if (kategori_utama === lama) return null;
+    const { kategori_utama } = kategoriIndividu(ind);
+    const lama = ind.kategori_terkonfirmasi ?? null;
 
-      // Belum pernah punya kategori dan masih tidak punya → lewati
-      if (!lama && !kategori_utama) return null;
+    if (kategori_utama === lama) return acc;       // tidak ada perubahan
+    if (!lama && !kategori_utama) return acc;      // tidak pernah punya kategori
 
-      return {
-        individu_id: ind.id,
-        nama: ind.nama,
-        usia_display: usiaDisplay(ind.tanggal_lahir),
-        kategori_lama: lama,
-        kategori_baru: kategori_utama,
-      } satisfies Review;
-    })
-    .filter((r): r is Review => r !== null);
+    acc.push({
+      individu_id: ind.id,
+      nama: ind.nama,
+      usia_display: usiaDisplay(ind.tanggal_lahir),
+      kategori_lama: lama,
+      kategori_baru: kategori_utama,
+    });
+    return acc;
+  }, []);
 }

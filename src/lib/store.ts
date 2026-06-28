@@ -310,22 +310,28 @@ export const store = {
     members: Array<Omit<Individu, "id" | "created_at" | "rumah_tangga_id">>
   ): Promise<RumahTangga> {
     const rt = await this.addHousehold(house);
-    const created: Individu[] = [];
-    for (const m of members) {
-      created.push(await this.addIndividual({ ...m, rumah_tangga_id: rt.id }));
-    }
-    const kepala = created.find((c) => c.peran_dalam_kk === "kepala_keluarga");
-    const istri = created.find((c) => c.peran_dalam_kk === "istri");
-    if (kepala && istri) {
-      // Tautkan pasangan DUA ARAH agar keduanya terdeteksi PUS.
-      if (!istri.pasangan_id) {
-        await this.updateIndividual(istri.id, { pasangan_id: kepala.id });
+    try {
+      const created: Individu[] = [];
+      for (const m of members) {
+        created.push(await this.addIndividual({ ...m, rumah_tangga_id: rt.id }));
       }
-      if (!kepala.pasangan_id) {
-        await this.updateIndividual(kepala.id, { pasangan_id: istri.id });
+      const kepala = created.find((c) => c.peran_dalam_kk === "kepala_keluarga");
+      const istri = created.find((c) => c.peran_dalam_kk === "istri");
+      if (kepala && istri) {
+        // Tautkan pasangan DUA ARAH agar keduanya terdeteksi PUS.
+        if (!istri.pasangan_id) {
+          await this.updateIndividual(istri.id, { pasangan_id: kepala.id });
+        }
+        if (!kepala.pasangan_id) {
+          await this.updateIndividual(kepala.id, { pasangan_id: istri.id });
+        }
       }
+      return rt;
+    } catch (e) {
+      // Rollback: hapus rumah tangga (cascade ke individuals yang sudah tersimpan).
+      await this.deleteHousehold(rt.id).catch(() => {});
+      throw e;
     }
-    return rt;
   },
 
   // ---- Individuals ----
