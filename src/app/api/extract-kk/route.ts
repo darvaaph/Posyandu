@@ -164,6 +164,28 @@ export async function POST(req: NextRequest) {
     const result = KKExtractionSchema.safeParse(parsedJson);
     const data = result.success ? result.data : parsedJson;
 
+    // Deteksi gambar yang BUKAN Kartu Keluarga (atau terlalu buram untuk dibaca):
+    // bila tidak ada satu pun anggota DAN tidak ada nama kepala keluarga, berarti
+    // tidak ada data KK yang berhasil dibaca. Tolak dengan pesan yang jelas
+    // alih-alih mengirim hasil kosong ke layar review.
+    const rec = (data ?? {}) as {
+      anggota?: unknown;
+      nama_kepala_keluarga?: unknown;
+    };
+    const jumlahAnggota = Array.isArray(rec.anggota) ? rec.anggota.length : 0;
+    const adaNamaKK =
+      typeof rec.nama_kepala_keluarga === "string" &&
+      rec.nama_kepala_keluarga.trim() !== "";
+    if (jumlahAnggota === 0 && !adaNamaKK) {
+      return NextResponse.json(
+        {
+          error:
+            "Gambar tidak dikenali sebagai Kartu Keluarga. Pastikan Anda memotret KK yang jelas dan utuh, lalu coba lagi.",
+        },
+        { status: 422 }
+      );
+    }
+
     // 5) Gambar dibuang otomatis (hanya di memori request ini; tidak disimpan/di-log).
     return NextResponse.json({ data });
   } catch (e) {

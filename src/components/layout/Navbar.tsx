@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, LogOut } from "lucide-react";
+import { Bell, LogOut, HelpCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useReviews } from "@/hooks/useReviews";
 import { ConfirmDialog } from "@/components/dialogs/ConfirmDialog";
@@ -37,6 +37,13 @@ export function Navbar() {
                   {reviews.length}
                 </span>
               )}
+            </Link>
+            <Link
+              href="/panduan"
+              className="rounded-md p-2 text-muted-foreground hover:bg-accent"
+              aria-label="Panduan"
+            >
+              <HelpCircle className="h-5 w-5" />
             </Link>
             <button
               onClick={() => setLogoutOpen(true)}

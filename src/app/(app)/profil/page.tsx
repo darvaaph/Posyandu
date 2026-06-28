@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { BookOpen, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProfileForm } from "@/components/forms/ProfileForm";
 import { SeedDataCard } from "@/components/dev/SeedDataCard";
@@ -35,6 +37,21 @@ export default function ProfilPage() {
           <ProfileForm kader={kader} />
         </CardContent>
       </Card>
+
+      <Link href="/panduan">
+        <Card className="flex items-center gap-3 p-4 transition hover:border-primary">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+            <BookOpen className="h-5 w-5" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium">Panduan Penggunaan</p>
+            <p className="text-xs text-muted-foreground">
+              Cara memakai aplikasi & memasang di HP
+            </p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </Card>
+      </Link>
 
       {isDev && <SeedDataCard />}
     </div>

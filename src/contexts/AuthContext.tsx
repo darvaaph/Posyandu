@@ -111,6 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(
     async (payload: RegisterPayload) => {
+      if (isOffline()) throw new Error(OFFLINE_MSG);
       const { data, error } = await supabase.auth.signUp({
         email: payload.email,
         password: payload.password,
@@ -122,7 +123,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         },
       });
-      if (error) throw new Error(errMsg(error, "Registrasi gagal"));
+      if (error) {
+        throw new Error(
+          isNetworkError(error) ? OFFLINE_MSG : errMsg(error, "Registrasi gagal")
+        );
+      }
 
       if (!data.session) {
         // Konfirmasi email aktif — profil dibuat saat login pertama
@@ -141,12 +146,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
+      // Login butuh koneksi (verifikasi ke server Supabase). Beri pesan jelas
+      // bila perangkat sedang offline, alih-alih "Failed to fetch".
+      if (isOffline()) throw new Error(OFFLINE_MSG);
       // Lempar error agar form bisa menampilkannya inline (lihat LoginForm).
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw new Error(errMsg(error, "Email atau password salah"));
+      if (error) {
+        throw new Error(
+          isNetworkError(error) ? OFFLINE_MSG : errMsg(error, "Email atau password salah")
+        );
+      }
       await bootstrap(data.user);
     },
     [bootstrap]
@@ -183,6 +195,23 @@ function errMsg(e: unknown, fallback: string): string {
     return String((e as { message: string }).message) || fallback;
   }
   return fallback;
+}
+
+const OFFLINE_MSG =
+  "Tidak ada koneksi internet. Fitur ini membutuhkan koneksi — periksa jaringan Anda, lalu coba lagi.";
+
+/** Perangkat sedang offline menurut browser. */
+function isOffline(): boolean {
+  return typeof navigator !== "undefined" && !navigator.onLine;
+}
+
+/** Error berasal dari kegagalan jaringan (mis. "Failed to fetch"). */
+function isNetworkError(e: unknown): boolean {
+  const msg =
+    e && typeof e === "object" && "message" in e
+      ? String((e as { message: unknown }).message)
+      : "";
+  return /failed to fetch|networkerror|network request failed|load failed/i.test(msg);
 }
 
 export function useAuth() {
