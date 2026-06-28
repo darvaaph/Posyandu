@@ -23,6 +23,7 @@ export function HouseholdForm({ existing }: { existing?: RumahTangga }) {
     defaultValues: existing
       ? {
           no_rumah: existing.no_rumah,
+          no_kk: existing.no_kk ?? "",
           alamat: existing.alamat,
           dusun: existing.dusun,
           rt: existing.rt,
@@ -36,6 +37,10 @@ export function HouseholdForm({ existing }: { existing?: RumahTangga }) {
   const onSubmit = async (data: HouseholdInput) => {
     if (store.noRumahExists(data.no_rumah, existing?.id)) {
       notify("Nomor rumah sudah terdaftar", "error");
+      return;
+    }
+    if (data.no_kk && store.noKKExists(data.no_kk, existing?.id)) {
+      notify("Nomor KK sudah terdaftar", "error");
       return;
     }
     try {
@@ -62,6 +67,17 @@ export function HouseholdForm({ existing }: { existing?: RumahTangga }) {
         <Label>Nomor Rumah</Label>
         <Input placeholder="001" {...register("no_rumah")} />
         <FieldError message={errors.no_rumah?.message} />
+      </div>
+
+      <div>
+        <Label>Nomor KK (opsional)</Label>
+        <Input
+          inputMode="numeric"
+          maxLength={16}
+          placeholder="16 digit"
+          {...register("no_kk")}
+        />
+        <FieldError message={errors.no_kk?.message} />
       </div>
 
       <div>

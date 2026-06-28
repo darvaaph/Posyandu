@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS households (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   kader_id UUID NOT NULL REFERENCES kader_profiles(id) ON DELETE CASCADE,
   no_rumah TEXT NOT NULL,
+  no_kk TEXT,                       -- Nomor KK (opsional; unik-jika-ada per kader)
   alamat TEXT NOT NULL,
   dusun TEXT DEFAULT '',
   rt TEXT DEFAULT '',
@@ -61,6 +62,9 @@ CREATE TABLE IF NOT EXISTS reports (
 
 -- INDEXES
 CREATE INDEX IF NOT EXISTS idx_households_kader_id ON households(kader_id);
+-- No. KK unik per kader, hanya berlaku saat terisi (yang NULL tidak bentrok)
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_households_no_kk
+  ON households(kader_id, no_kk) WHERE no_kk IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_individuals_household_id ON individuals(household_id);
 CREATE INDEX IF NOT EXISTS idx_individuals_nik ON individuals(nik);
 CREATE INDEX IF NOT EXISTS idx_reports_kader_id ON reports(kader_id);

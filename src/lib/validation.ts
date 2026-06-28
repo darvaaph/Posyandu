@@ -15,6 +15,12 @@ export const RegisterSchema = z.object({
 
 export const HouseholdSchema = z.object({
   no_rumah: z.string().min(1, "Nomor rumah wajib diisi"),
+  // Opsional: boleh kosong, tapi kalau diisi harus tepat 16 digit angka
+  no_kk: z
+    .string()
+    .regex(/^\d{16}$/, "No. KK harus 16 digit angka")
+    .or(z.literal(""))
+    .optional(),
   alamat: z.string().min(1, "Alamat wajib diisi"),
   dusun: z.string().optional().default(""),
   rt: z.string().optional().default(""),

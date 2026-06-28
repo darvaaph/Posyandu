@@ -38,6 +38,7 @@ export interface KaderProfile {
 export interface RumahTangga {
   id: string;
   no_rumah: string;
+  no_kk?: string | null; // Nomor KK (opsional)
   alamat: string;
   dusun: string;
   rt: string;

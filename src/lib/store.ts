@@ -66,6 +66,7 @@ function mapHousehold(r: any): RumahTangga {
   return {
     id: r.id,
     no_rumah: r.no_rumah,
+    no_kk: r.no_kk ?? null,
     alamat: r.alamat,
     dusun: r.dusun ?? "",
     rt: r.rt ?? "",
@@ -246,7 +247,7 @@ export const store = {
     if (!cache.kader) throw new Error("Belum login");
     const { data: row, error } = await supabase
       .from("households")
-      .insert({ ...data, kader_id: cache.kader.id })
+      .insert({ ...data, no_kk: data.no_kk || null, kader_id: cache.kader.id })
       .select()
       .single();
     if (error) throw error;
@@ -261,6 +262,7 @@ export const store = {
       .from("households")
       .update({
         no_rumah: patch.no_rumah,
+        no_kk: patch.no_kk || null,
         alamat: patch.alamat,
         dusun: patch.dusun,
         rt: patch.rt,
@@ -290,6 +292,37 @@ export const store = {
     return cache.households.some(
       (h) => h.no_rumah === no_rumah && h.id !== exceptId
     );
+  },
+
+  noKKExists(no_kk: string, exceptId?: string): boolean {
+    if (!no_kk) return false;
+    return cache.households.some(
+      (h) => h.no_kk === no_kk && h.id !== exceptId
+    );
+  },
+
+  /**
+   * Simpan 1 rumah tangga + banyak anggota sekaligus (dipakai alur ekstraksi KK).
+   * Otomatis menautkan pasangan istri → kepala keluarga.
+   */
+  async addHouseholdWithMembers(
+    house: Omit<RumahTangga, "id" | "created_at">,
+    members: Array<Omit<Individu, "id" | "created_at" | "rumah_tangga_id">>
+  ): Promise<RumahTangga> {
+    const rt = await this.addHousehold(house);
+    const created: Individu[] = [];
+    for (const m of members) {
+      created.push(await this.addIndividual({ ...m, rumah_tangga_id: rt.id }));
+    }
+    const kepala = created.find((c) => c.peran_dalam_kk === "kepala_keluarga");
+    if (kepala) {
+      for (const c of created) {
+        if (c.peran_dalam_kk === "istri" && !c.pasangan_id) {
+          await this.updateIndividual(c.id, { pasangan_id: kepala.id });
+        }
+      }
+    }
+    return rt;
   },
 
   // ---- Individuals ----
