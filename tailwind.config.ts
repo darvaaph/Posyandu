@@ -40,6 +40,15 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        "toast-enter": {
+          "0%":   { opacity: "0", transform: "translateX(48px) scale(0.95)" },
+          "100%": { opacity: "1", transform: "translateX(0)    scale(1)" },
+        },
+      },
+      animation: {
+        "toast-enter": "toast-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1) both",
+      },
     },
   },
   plugins: [],

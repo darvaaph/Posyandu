@@ -2,6 +2,7 @@
 
 import { CheckCheck, Check } from "lucide-react";
 import { useReviews } from "@/hooks/useReviews";
+import { useDatabase } from "@/hooks/useData";
 import { store } from "@/lib/store";
 import { useNotification } from "@/contexts/NotificationContext";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,12 @@ import { ArrowRight } from "lucide-react";
 
 export default function TinjauanPage() {
   const reviews = useReviews();
+  const db = useDatabase();
   const { notify } = useNotification();
+
+  const totalAktif = db.individuals.filter((i) => i.status === "aktif").length;
+  const sudahKonfirmasi = totalAktif - reviews.length;
+  const persen = totalAktif > 0 ? Math.round((sudahKonfirmasi / totalAktif) * 100) : 100;
 
   const konfirmasi = async (individuId: string, kategoriBaru: string) => {
     try {
@@ -55,6 +61,23 @@ export default function TinjauanPage() {
           </Button>
         )}
       </div>
+
+      {/* Progress bar konfirmasi */}
+      <Card className="px-4 py-3">
+        <div className="mb-2 flex items-center justify-between text-sm">
+          <span className="font-medium">Progress Tinjauan</span>
+          <span className="text-muted-foreground">
+            {sudahKonfirmasi}/{totalAktif} dikonfirmasi
+          </span>
+        </div>
+        <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-500"
+            style={{ width: `${persen}%` }}
+          />
+        </div>
+        <p className="mt-1.5 text-right text-xs text-muted-foreground">{persen}%</p>
+      </Card>
 
       {reviews.length === 0 ? (
         <EmptyState

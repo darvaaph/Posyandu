@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useCallback, useState } from "react";
+import { CheckCircle2, XCircle, Info, X } from "lucide-react";
 import { uid } from "@/lib/utils";
 
 type ToastType = "success" | "error" | "info";
@@ -43,6 +44,27 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   );
 }
 
+const TOAST_CONFIG: Record<
+  ToastType,
+  { icon: React.ReactNode; border: string; iconBg: string }
+> = {
+  success: {
+    icon: <CheckCircle2 className="h-4 w-4 text-green-600" />,
+    border: "border-l-green-500",
+    iconBg: "bg-green-50",
+  },
+  error: {
+    icon: <XCircle className="h-4 w-4 text-red-500" />,
+    border: "border-l-red-500",
+    iconBg: "bg-red-50",
+  },
+  info: {
+    icon: <Info className="h-4 w-4 text-blue-500" />,
+    border: "border-l-blue-500",
+    iconBg: "bg-blue-50",
+  },
+};
+
 function ToastViewport({
   toasts,
   onDismiss,
@@ -50,22 +72,29 @@ function ToastViewport({
   toasts: Toast[];
   onDismiss: (id: string) => void;
 }) {
-  const styles: Record<ToastType, string> = {
-    success: "bg-green-600 text-white",
-    error: "bg-red-600 text-white",
-    info: "bg-slate-800 text-white",
-  };
   return (
-    <div className="fixed bottom-20 left-1/2 z-[100] flex w-full max-w-sm -translate-x-1/2 flex-col gap-2 px-4 md:bottom-6">
-      {toasts.map((t) => (
-        <button
-          key={t.id}
-          onClick={() => onDismiss(t.id)}
-          className={`rounded-lg px-4 py-3 text-sm font-medium shadow-lg ${styles[t.type]}`}
-        >
-          {t.message}
-        </button>
-      ))}
+    <div className="fixed left-1/2 top-[4.5rem] z-[100] flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 flex-col gap-2 md:left-auto md:right-6 md:translate-x-0">
+      {toasts.map((t) => {
+        const cfg = TOAST_CONFIG[t.type];
+        return (
+          <div
+            key={t.id}
+            className={`animate-toast-enter flex items-center gap-3 rounded-lg border border-l-4 bg-white px-4 py-3 shadow-lg ${cfg.border}`}
+          >
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${cfg.iconBg}`}>
+              {cfg.icon}
+            </span>
+            <p className="flex-1 text-sm font-medium text-foreground">{t.message}</p>
+            <button
+              onClick={() => onDismiss(t.id)}
+              className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground"
+              aria-label="Tutup"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }
