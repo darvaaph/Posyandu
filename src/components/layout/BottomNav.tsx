@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useReviews } from "@/hooks/useReviews";
 
 const items = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, extra: ["/kategori"] },
   { href: "/rumah-tangga", label: "Data Warga", icon: Users },
   { href: "/tinjauan", label: "Tinjauan", icon: ClipboardCheck },
   { href: "/laporan", label: "Laporan", icon: FileText },
@@ -23,7 +23,9 @@ export function BottomNav() {
       <div className="mx-auto flex max-w-5xl items-stretch justify-around">
         {items.map((item) => {
           const active =
-            pathname === item.href || pathname.startsWith(item.href + "/");
+            pathname === item.href ||
+            pathname.startsWith(item.href + "/") ||
+            item.extra?.some((p) => pathname.startsWith(p));
           const Icon = item.icon;
           return (
             <Link

@@ -50,12 +50,17 @@ export function LoginForm() {
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         Masuk
       </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        Belum punya akun?{" "}
-        <Link href="/register" className="font-medium text-primary underline">
-          Daftar
+      <div className="flex flex-col items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/lupa-password" className="text-primary underline">
+          Lupa password?
         </Link>
-      </p>
+        <span>
+          Belum punya akun?{" "}
+          <Link href="/register" className="font-medium text-primary underline">
+            Daftar
+          </Link>
+        </span>
+      </div>
     </form>
   );
 }

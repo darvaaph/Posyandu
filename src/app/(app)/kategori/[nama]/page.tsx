@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, FileDown, FileText } from "lucide-react";
 import { useDatabase } from "@/hooks/useData";
 import { useKategoriMembers } from "@/hooks/useKategori";
 import { KATEGORI_META, KATEGORI_LIST, STATUS_KB_OPTIONS } from "@/lib/constants";
 import { usiaDisplay, formatTanggal } from "@/lib/date";
-import { exportCSV } from "@/lib/export";
+import { exportCSV, exportPDF } from "@/lib/export";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SearchBar, EmptyState } from "@/components/common/Common";
@@ -52,11 +52,11 @@ export default function KategoriDetailPage() {
 
   const meta = KATEGORI_META[namaDecoded];
 
-  const handleExport = () => {
+  const buildRows = (): { headers: string[]; rows: string[][] } => {
     if (isPUS) {
-      const rows: (string | number)[][] = [
-        ["Istri", "NIK Istri", "Status KB", "Suami", "Usia Istri", "Alamat"],
-        ...filtered.map((m) => {
+      return {
+        headers: ["Istri", "NIK Istri", "Status KB", "Suami", "Usia Istri", "Alamat"],
+        rows: filtered.map((m) => {
           const suami = db.individuals.find((i) => i.id === m.pasangan_id);
           return [
             m.nama,
@@ -67,22 +67,30 @@ export default function KategoriDetailPage() {
             alamatOf(m),
           ];
         }),
-      ];
-      exportCSV(`kategori-PUS-${Date.now()}`, rows);
-    } else {
-      const rows: (string | number)[][] = [
-        ["Nama", "NIK", "Usia", "Tanggal Lahir", "Jenis Kelamin", "Alamat"],
-        ...filtered.map((m) => [
-          m.nama,
-          m.nik,
-          usiaDisplay(m.tanggal_lahir),
-          formatTanggal(m.tanggal_lahir),
-          m.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan",
-          alamatOf(m),
-        ]),
-      ];
-      exportCSV(`kategori-${namaDecoded}-${Date.now()}`, rows);
+      };
     }
+    return {
+      headers: ["Nama", "NIK", "Usia", "Tanggal Lahir", "Jenis Kelamin", "Alamat"],
+      rows: filtered.map((m) => [
+        m.nama,
+        m.nik,
+        usiaDisplay(m.tanggal_lahir),
+        formatTanggal(m.tanggal_lahir),
+        m.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan",
+        alamatOf(m),
+      ]),
+    };
+  };
+
+  const handleExportCSV = () => {
+    const { headers, rows } = buildRows();
+    exportCSV(`kategori-${namaDecoded}-${Date.now()}`, [headers, ...rows]);
+  };
+
+  const handleExportPDF = () => {
+    const { headers, rows } = buildRows();
+    const judul = `Kategori ${namaDecoded} · ${members.length} warga`;
+    exportPDF(judul, headers, rows);
   };
 
   return (
@@ -107,9 +115,14 @@ export default function KategoriDetailPage() {
           </div>
         </div>
         {filtered.length > 0 && (
-          <Button variant="outline" size="sm" onClick={handleExport}>
-            <Download className="h-4 w-4" /> Ekspor
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExportCSV}>
+              <FileText className="h-4 w-4" /> CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportPDF}>
+              <FileDown className="h-4 w-4" /> PDF
+            </Button>
+          </div>
         )}
       </div>
 
