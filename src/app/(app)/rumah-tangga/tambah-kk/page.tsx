@@ -182,9 +182,9 @@ export default function ReviewKKPage() {
         <ArrowLeft className="h-4 w-4" /> Kembali
       </Link>
       <div>
-        <h1 className="text-xl font-bold">Periksa Hasil Baca KK</h1>
+        <h1 className="text-xl font-bold">Cek Hasil Baca KK</h1>
         <p className="text-sm text-muted-foreground">
-          Data terisi otomatis. Periksa & perbaiki bila perlu sebelum disimpan.
+          Cek dulu hasilnya, baru simpan.
         </p>
       </div>
 

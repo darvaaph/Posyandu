@@ -60,18 +60,18 @@ const SECTIONS: Section[] = [
     body: (
       <div className="space-y-3">
         <div>
-          <p className="font-medium text-foreground">Cara A — Otomatis dari foto KK (AI) ⭐</p>
+          <p className="font-medium text-foreground">Pakai foto KK (lebih cepat)</p>
           <ol className="ml-4 list-decimal space-y-0.5">
             <li>Data Warga → Tambah → &quot;Ambil Foto&quot; atau &quot;Unggah Gambar&quot;.</li>
-            <li>AI membaca seluruh anggota keluarga.</li>
-            <li>Periksa hasilnya. Bila ada peringatan ⚠️ tanggal lahir vs NIK, ketuk &quot;Pakai&quot; atau perbaiki manual.</li>
+            <li>Aplikasi baca semua anggota dari foto KK.</li>
+            <li>Cek hasilnya. Ada peringatan ⚠️ tanggal lahir vs NIK? Ketuk &quot;Pakai&quot; atau betulkan sendiri.</li>
             <li>Isi Nomor Rumah, lalu ketuk &quot;Simpan Semua&quot;.</li>
           </ol>
-          <p className="mt-1 text-xs">📌 Foto KK tidak disimpan. Hasil AI wajib diperiksa karena bisa salah baca.</p>
+          <p className="mt-1 text-xs">📌 Foto tidak tersimpan di aplikasi. Cek hasilnya dulu karena bisa ada yang kurang tepat.</p>
         </div>
         <div>
-          <p className="font-medium text-foreground">Cara B — Isi manual</p>
-          <p>Di bawah pemisah &quot;atau isi manual&quot;, isi formulir rumah tangga lalu tambah anggota satu per satu. Kategori muncul otomatis saat tanggal lahir diisi.</p>
+          <p className="font-medium text-foreground">Ketik sendiri</p>
+          <p>Scroll ke bawah, ada pilihan isi manual. Tambah anggota satu per satu. Kategori langsung muncul begitu tanggal lahir diisi.</p>
         </div>
         <p className="rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
           Jika foto bukan KK atau buram, muncul pesan &quot;Gambar tidak dikenali sebagai Kartu Keluarga&quot;. Foto ulang dengan jelas.
@@ -106,7 +106,7 @@ const SECTIONS: Section[] = [
     title: "Tinjauan bulanan",
     body: (
       <p>
-        Seiring waktu warga berpindah kategori (mis. bayi jadi batita). Menu Tinjauan menampilkan warga yang berubah & belum dikonfirmasi. Ketuk &quot;Konfirmasi&quot; per warga, atau &quot;Konfirmasi Semua&quot; sekaligus. Progress bar menunjukkan berapa yang sudah selesai.
+        Warga bisa ganti kategori tiap bulan, misalnya bayi yang sudah 1 tahun jadi batita. Menu Tinjauan menampilkan siapa saja yang berubah. Ketuk &quot;Konfirmasi&quot; per orang, atau langsung &quot;Konfirmasi Semua&quot;. Ada progress bar untuk lihat sudah berapa yang selesai.
       </p>
     ),
   },
@@ -135,7 +135,7 @@ const SECTIONS: Section[] = [
         <p>
           Saat tidak ada internet, aplikasi hanya menampilkan halaman &quot;Tidak ada koneksi&quot;. Penggunaan penuh tanpa internet (offline) adalah <b>rencana pengembangan</b> ke depan.
         </p>
-        <p className="text-xs">Pastikan Anda online saat login dan menginput data.</p>
+        <p className="text-xs">Pastikan HP terhubung internet saat mau login atau simpan data.</p>
       </div>
     ),
   },
@@ -145,7 +145,7 @@ const SECTIONS: Section[] = [
     title: "Tips foto KK & masalah umum",
     body: (
       <div className="space-y-2">
-        <p className="font-medium text-foreground">Agar AI akurat:</p>
+        <p className="font-medium text-foreground">Biar hasilnya akurat:</p>
         <ul className="ml-4 list-disc space-y-0.5">
           <li>Foto di tempat terang, hindari bayangan & pantulan.</li>
           <li>Posisikan KK lurus & penuhi bingkai.</li>
@@ -179,7 +179,7 @@ export default function PanduanPage() {
         <div className="mt-3 mb-4">
           <h1 className="text-xl font-bold">Panduan Penggunaan</h1>
           <p className="text-sm text-muted-foreground">
-            Cara memakai {APP_NAME} — ketuk untuk membuka tiap bagian.
+            Ketuk bagian di bawah untuk membuka.
           </p>
         </div>
 

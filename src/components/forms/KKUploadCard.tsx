@@ -30,7 +30,7 @@ export function KKUploadCard() {
       const data = await extractKK(image);
       // Teruskan hasil ke layar review (gambar TIDAK ikut disimpan)
       sessionStorage.setItem(KK_REVIEW_KEY, JSON.stringify(data));
-      notify("KK berhasil dibaca — periksa & lengkapi", "success");
+      notify("KK terbaca, cek hasilnya sebelum simpan", "success");
       router.push("/rumah-tangga/tambah-kk");
     } catch (err) {
       notify(
@@ -47,11 +47,11 @@ export function KKUploadCard() {
       <CardContent className="space-y-3 pt-5">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
-          <p className="text-sm font-semibold">Isi otomatis dari foto KK</p>
+          <p className="text-sm font-semibold">Foto KK, data langsung terisi</p>
         </div>
         <p className="text-xs text-muted-foreground">
-          Foto atau unggah Kartu Keluarga — data anggota terisi otomatis, lalu
-          Anda tinggal memeriksa & melengkapi. Foto tidak disimpan.
+          Foto KK lalu cek hasilnya. Data warga langsung terisi, tinggal simpan.
+          Foto tidak tersimpan di aplikasi.
         </p>
 
         <input

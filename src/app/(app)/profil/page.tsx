@@ -38,7 +38,7 @@ export default function ProfilPage() {
         </CardContent>
       </Card>
 
-      <Link href="/panduan">
+      <Link href="/panduan" className="block">
         <Card className="flex items-center gap-3 p-4 transition hover:border-primary">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground">
             <BookOpen className="h-5 w-5" />
