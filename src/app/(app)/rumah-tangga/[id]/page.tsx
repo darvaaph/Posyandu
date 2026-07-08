@@ -8,14 +8,14 @@ import { useDatabase, useIndividuals } from "@/hooks/useData";
 import { store } from "@/lib/store";
 import { useNotification } from "@/contexts/NotificationContext";
 import { kategoriIndividu } from "@/lib/kategorisasi";
-import { usiaDisplay } from "@/lib/date";
+import { usiaDisplay, formatTanggal } from "@/lib/date";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/common/Common";
 import { KategoriBadge } from "@/components/cards/KategoriCard";
 import { ConfirmDeleteDialog } from "@/components/dialogs/ConfirmDeleteDialog";
-import { PERAN_KK_OPTIONS } from "@/lib/constants";
+import { PERAN_KK_OPTIONS, STATUS_KB_OPTIONS } from "@/lib/constants";
 
 export default function RumahTanggaDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -126,6 +126,20 @@ export default function RumahTanggaDetailPage() {
                       {a.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan"}
                     </p>
                     <p className="text-xs text-muted-foreground">NIK: {a.nik}</p>
+                    {(a.status_hamil || (a.status_kb && a.status_kb !== "tidak")) && (
+                      <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                        {a.status_hamil && (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2.5 py-0.5 text-rose-700 border border-rose-100 font-medium">
+                            🤰 Sedang Hamil {a.perkiraan_tgl_lahir && `(HPL: ${formatTanggal(a.perkiraan_tgl_lahir)})`}
+                          </span>
+                        )}
+                        {a.status_kb && a.status_kb !== "tidak" && (
+                          <span className="inline-flex items-center gap-1 rounded-md bg-violet-50 px-2.5 py-0.5 text-violet-700 border border-violet-100 font-medium">
+                            💊 KB: {STATUS_KB_OPTIONS.find((o) => o.value === a.status_kb)?.label ?? a.status_kb}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <Link href={`/rumah-tangga/${rt.id}/anggota/${a.id}`}>

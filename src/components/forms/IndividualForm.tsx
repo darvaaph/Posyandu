@@ -93,7 +93,10 @@ export function IndividualForm({
   };
 
   const calonPasangan = anggotaRumah.filter(
-    (a) => a.id !== existing?.id && a.jenis_kelamin === "L"
+    (a) =>
+      a.id !== existing?.id &&
+      a.jenis_kelamin === "L" &&
+      hitungUsia(a.tanggal_lahir).tahun >= 15
   );
 
   const onSubmit = async (data: IndividualInput) => {
