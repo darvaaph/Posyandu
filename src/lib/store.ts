@@ -108,6 +108,7 @@ function mapReport(r: any): Laporan {
     jumlah_data: r.jumlah_data,
     periode: r.periode,
     created_at: r.created_at,
+    data_warga: r.data_warga ?? null,
   };
 }
 
@@ -386,6 +387,7 @@ export const store = {
         kategori: data.kategori,
         jumlah_data: data.jumlah_data,
         periode: data.periode,
+        data_warga: data.data_warga ?? null,
       })
       .select()
       .single();

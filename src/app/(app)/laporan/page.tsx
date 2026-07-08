@@ -24,6 +24,14 @@ export default function LaporanPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const rowsFor = (lap: Laporan) => {
+    if (lap.data_warga && lap.data_warga.length > 0) {
+      return lap.data_warga.map((w) => [
+        w.nama,
+        w.nik,
+        w.usia,
+        w.jk,
+      ]);
+    }
     const refDate = parsePeriode(lap.periode);
     const members =
       lap.kategori === "Semua"

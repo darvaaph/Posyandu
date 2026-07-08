@@ -60,7 +60,7 @@ export default function GenerateLaporanPage() {
     m.nama,
     m.nik,
     usiaDisplay(m.tanggal_lahir, refDate),
-    m.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan",
+    m.jenis_kelamin === "L" ? "L" : "P",
   ]);
 
   const simpan = () =>
@@ -69,12 +69,18 @@ export default function GenerateLaporanPage() {
       kategori,
       jumlah_data: members.length,
       periode,
+      data_warga: members.map((m) => ({
+        nama: m.nama,
+        nik: m.nik,
+        usia: usiaDisplay(m.tanggal_lahir, refDate),
+        jk: m.jenis_kelamin === "L" ? "L" : "P",
+      })),
     });
 
   const handlePDF = async () => {
     try {
       await simpan();
-      exportPDF(judul, ["Nama", "NIK", "Usia", "Jenis Kelamin"], rows as string[][]);
+      exportPDF(judul, ["Nama", "NIK", "Usia", "JK"], rows as string[][]);
       notify("Laporan dibuat & dicetak", "success");
       router.push("/laporan");
     } catch (e) {
@@ -85,7 +91,7 @@ export default function GenerateLaporanPage() {
   const handleExcel = async () => {
     try {
       await simpan();
-      exportCSV(judul, [["Nama", "NIK", "Usia", "Jenis Kelamin"], ...rows]);
+      exportCSV(judul, [["Nama", "NIK", "Usia", "JK"], ...rows]);
       notify("Laporan dibuat & diekspor", "success");
       router.push("/laporan");
     } catch (e) {

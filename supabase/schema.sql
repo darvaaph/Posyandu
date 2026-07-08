@@ -57,7 +57,8 @@ CREATE TABLE IF NOT EXISTS reports (
   kategori TEXT NOT NULL,
   jumlah_data INTEGER DEFAULT 0,
   periode TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  data_warga JSONB DEFAULT '[]'::jsonb
 );
 
 -- INDEXES

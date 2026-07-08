@@ -84,6 +84,13 @@ export interface Review {
   kategori_baru: KategoriNama | undefined;
 }
 
+export interface LaporanItemSnapshot {
+  nama: string;
+  nik: string;
+  usia: string;
+  jk: string;
+}
+
 export interface Laporan {
   id: string;
   judul: string;
@@ -91,4 +98,5 @@ export interface Laporan {
   jumlah_data: number;
   created_at: string;
   periode: string;
+  data_warga?: LaporanItemSnapshot[] | null;
 }
