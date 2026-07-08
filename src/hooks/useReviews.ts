@@ -6,7 +6,7 @@ import { usiaDisplay } from "@/lib/date";
 import type { Individu, Review } from "@/lib/types";
 
 /**
- * Tinjauan bulanan: warga aktif yang kategori terkininya berbeda dari
+ * Tinjauan kategori: warga aktif yang kategori terkininya berbeda dari
  * kategori yang terakhir dikonfirmasi kader (atau belum pernah dikonfirmasi).
  *
  * Warga yang tidak pernah punya kategori sasaran dan masih tidak punya

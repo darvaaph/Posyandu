@@ -13,7 +13,7 @@
 4. [Mengenal Tampilan](#4-mengenal-tampilan)
 5. [Menambah Data Warga](#5-menambah-data-warga)
 6. [Memahami Kategori Sasaran](#6-memahami-kategori-sasaran)
-7. [Tinjauan Bulanan](#7-tinjauan-bulanan)
+7. [Tinjauan Kategori](#7-tinjauan-kategori)
 8. [Membuat & Mengekspor Laporan](#8-membuat--mengekspor-laporan)
 9. [Profil & Keluar](#9-profil--keluar)
 10. [Penggunaan Offline](#10-penggunaan-offline)
@@ -131,7 +131,7 @@ Satu warga bisa masuk **beberapa kategori** sekaligus. Ketuk kartu kategori di D
 
 ---
 
-## 7. Tinjauan Bulanan
+## 7. Tinjauan Kategori
 
 Seiring waktu, warga berpindah kategori (mis. bayi menjadi batita). Menu **Tinjauan** menampilkan warga yang kategorinya berubah dan belum dikonfirmasi.
 

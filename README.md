@@ -53,7 +53,7 @@ npm run build && npm run start
 - **Kategorisasi real-time** — preview kategori saat mengisi tanggal lahir
   (Bayi / Batita / Balita / Remaja / WUS / PUS / Ibu Hamil / Lansia).
 - **Dashboard** — ringkasan jumlah per kategori + statistik.
-- **Tinjauan bulanan** — warga yang kategorinya berubah, konfirmasi satuan /
+- **Tinjauan kategori** — warga yang kategorinya berubah, konfirmasi satuan /
   semua.
 - **Laporan** — generate per kategori, pratinjau, ekspor PDF (print) & Excel (CSV).
 - **Profil kader** — edit profil, reset data contoh.

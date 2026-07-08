@@ -103,7 +103,7 @@ const SECTIONS: Section[] = [
   {
     id: "tinjauan",
     icon: "✅",
-    title: "Tinjauan bulanan",
+    title: "Tinjauan kategori",
     body: (
       <p>
         Warga bisa ganti kategori tiap bulan, misalnya bayi yang sudah 1 tahun jadi batita. Menu Tinjauan menampilkan siapa saja yang berubah. Ketuk &quot;Konfirmasi&quot; per orang, atau langsung &quot;Konfirmasi Semua&quot;. Ada progress bar untuk lihat sudah berapa yang selesai.

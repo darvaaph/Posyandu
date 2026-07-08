@@ -62,7 +62,7 @@ export default function TinjauanPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">Tinjauan Bulanan</h1>
+          <h1 className="text-xl font-bold">Tinjauan Kategori</h1>
           <p className="text-sm text-muted-foreground">
             {reviews.length} warga dengan perubahan kategori
           </p>
