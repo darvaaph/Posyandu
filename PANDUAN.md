@@ -1,6 +1,6 @@
-# 📖 Panduan Penggunaan SIGAP Posyandu
+# 📖 Panduan Penggunaan REKAP Posyandu
 
-**SIGAP Posyandu** (Sistem Informasi Gizi & Pencatatan Posyandu) adalah aplikasi web untuk membantu kader mencatat data warga, mengelompokkan kategori sasaran secara otomatis, memantau perubahan kategori bulanan, dan membuat laporan — termasuk **mengisi data otomatis dari foto Kartu Keluarga (KK)** menggunakan AI.
+**REKAP Posyandu** (Register Elektronik Kader Posyandu) adalah aplikasi web untuk membantu kader mencatat data warga, mengelompokkan kategori sasaran secara otomatis, memantau perubahan kategori bulanan, dan membuat laporan — termasuk **mengisi data otomatis dari foto Kartu Keluarga (KK)** menggunakan AI.
 
 > Alamat aplikasi: **https://posyandu-one.vercel.app**
 
@@ -29,7 +29,7 @@ Aplikasi ini bisa dipasang di layar utama HP seperti aplikasi biasa, **tanpa Pla
 1. Buka **https://posyandu-one.vercel.app** di **Google Chrome**.
 2. Ketuk menu titik tiga (**⋮**) di kanan atas.
 3. Pilih **"Tambahkan ke Layar utama"** atau **"Instal aplikasi"**.
-4. Ketuk **Instal/Tambah**. Ikon SIGAP 👶 muncul di layar utama.
+4. Ketuk **Instal/Tambah**. Ikon REKAP 👶 muncul di layar utama.
 
 ### 🍏 iPhone / iPad (Safari)
 1. Buka alamat aplikasi di **Safari** (harus Safari, bukan Chrome).
@@ -187,4 +187,4 @@ Setelah aplikasi dipasang dan pernah dibuka, ia tetap dapat diakses saat **tidak
 
 ---
 
-*Dokumen ini adalah panduan pengguna SIGAP Posyandu. Untuk pertanyaan lebih lanjut, hubungi pengelola/admin posyandu Anda.*
+*Dokumen ini adalah panduan pengguna REKAP Posyandu. Untuk pertanyaan lebih lanjut, hubungi pengelola/admin posyandu Anda.*

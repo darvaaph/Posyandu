@@ -1,4 +1,4 @@
-// Domain types for SIGAP Posyandu (frontend-only)
+// Domain types for REKAP Posyandu (frontend-only)
 
 export type JenisKelamin = "L" | "P";
 

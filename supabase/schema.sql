@@ -1,4 +1,4 @@
--- SIGAP Posyandu — Supabase schema + RLS
+-- REKAP Posyandu — Supabase schema + RLS
 -- Jalankan di Supabase Studio → SQL Editor.
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

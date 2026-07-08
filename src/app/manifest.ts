@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SIGAP Posyandu",
-    short_name: "SIGAP",
-    description: "Sistem Informasi Gizi & Pencatatan Posyandu",
+    name: "REKAP Posyandu",
+    short_name: "REKAP",
+    description: "Register Elektronik Kader Posyandu",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#f8fafc",

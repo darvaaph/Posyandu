@@ -1,4 +1,4 @@
-const CACHE = "sigap-v1";
+const CACHE = "rekap-v1";
 
 // Aset shell yang di-cache saat install
 const SHELL = ["/offline"];

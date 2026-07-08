@@ -1,6 +1,6 @@
 import type { KategoriNama, PeranKK, StatusKB } from "./types";
 
-export const APP_NAME = "SIGAP Posyandu";
+export const APP_NAME = "REKAP Posyandu";
 
 export const KATEGORI_META: Record<
   KategoriNama,

@@ -1,4 +1,4 @@
-# Architecture & Frontend Structure — SIGAP Posyandu
+# Architecture & Frontend Structure — REKAP Posyandu
 
 **Versi:** 1.0  
 **Framework:** Next.js 14 + React 18  
@@ -26,7 +26,7 @@
 ## 2. Project Folder Structure
 
 ```
-sigap-posyandu/
+rekap-posyandu/
 ├── .env.local                      # Environment variables (git-ignored)
 ├── .env.example                    # Contoh env vars
 ├── package.json
@@ -585,7 +585,7 @@ SUPABASE_SERVICE_KEY=xxxxx
 
 # App
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api (dev)
-                        =https://sigap-posyandu.vercel.app/api (prod)
+                        =https://rekap-posyandu.vercel.app/api (prod)
 NEXT_PUBLIC_APP_ENV=development | production
 ```
 

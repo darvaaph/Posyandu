@@ -16,7 +16,7 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <LoadingSpinner label="Memuat SIGAP Posyandu..." />
+      <LoadingSpinner label="Memuat REKAP Posyandu..." />
     </div>
   );
 }

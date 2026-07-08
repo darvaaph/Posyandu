@@ -1,4 +1,4 @@
--- SIGAP Posyandu — Kategorisasi sebagai Postgres function + Realtime
+-- REKAP Posyandu — Kategorisasi sebagai Postgres function + Realtime
 -- Jalankan di Supabase Studio -> SQL Editor SETELAH schema.sql.
 
 -- =========================================================

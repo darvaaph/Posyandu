@@ -1,4 +1,4 @@
-# SIGAP Posyandu — Frontend
+# REKAP Posyandu — Frontend
 
 Implementasi berdasarkan [PRD.md](PRD.md). Dibangun dengan
 **Next.js 14 (App Router) + TypeScript + Tailwind CSS**, dengan UI bergaya

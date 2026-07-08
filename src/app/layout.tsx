@@ -4,12 +4,12 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 
 export const metadata: Metadata = {
-  title: "SIGAP Posyandu",
-  description: "Sistem Informasi Gizi & Pencatatan Posyandu",
+  title: "REKAP Posyandu",
+  description: "Register Elektronik Kader Posyandu",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SIGAP",
+    title: "REKAP",
   },
   icons: {
     apple: "/icons/icon-192.png",
