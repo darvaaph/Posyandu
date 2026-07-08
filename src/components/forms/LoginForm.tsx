@@ -8,6 +8,7 @@ import { LoginSchema, type LoginInput } from "@/lib/validation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input, Label, FieldError } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 export function LoginForm() {
   const { login } = useAuth();
@@ -44,7 +45,7 @@ export function LoginForm() {
       </div>
       <div>
         <Label>Password</Label>
-        <Input type="password" placeholder="••••••" {...register("password")} />
+        <PasswordInput placeholder="••••••" {...register("password")} />
         <FieldError message={errors.password?.message} />
       </div>
       <Button type="submit" className="w-full" disabled={isSubmitting}>

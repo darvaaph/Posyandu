@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input, Label } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 
 type Stage = "loading" | "form" | "success" | "invalid";
 
@@ -126,8 +127,7 @@ export default function ResetPasswordPage() {
 
       <div>
         <Label>Password Baru</Label>
-        <Input
-          type="password"
+        <PasswordInput
           placeholder="Minimal 6 karakter"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -137,8 +137,7 @@ export default function ResetPasswordPage() {
 
       <div>
         <Label>Konfirmasi Password</Label>
-        <Input
-          type="password"
+        <PasswordInput
           placeholder="Ulangi password baru"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
