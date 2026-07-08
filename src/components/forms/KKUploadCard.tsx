@@ -16,6 +16,7 @@ export function KKUploadCard() {
   const router = useRouter();
   const { notify } = useNotification();
   const [loading, setLoading] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
@@ -70,6 +71,22 @@ export function KKUploadCard() {
           onChange={handleFile}
         />
 
+        <div className="flex items-start gap-2.5 rounded-lg bg-background/60 p-3 border border-border">
+          <input
+            type="checkbox"
+            id="pdp-consent"
+            checked={consentChecked}
+            onChange={(e) => setConsentChecked(e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-input bg-background accent-primary"
+          />
+          <label
+            htmlFor="pdp-consent"
+            className="text-[11px] leading-relaxed text-muted-foreground select-none cursor-pointer"
+          >
+            Saya menyatakan telah mendapatkan <strong>persetujuan (consent)</strong> dari kepala keluarga untuk memotret/mengunggah dokumen KK ini sesuai dengan UU Perlindungan Data Pribadi (UU PDP).
+          </label>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center gap-2 py-3 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -80,6 +97,7 @@ export function KKUploadCard() {
             <Button
               type="button"
               className="flex-1"
+              disabled={!consentChecked}
               onClick={() => cameraRef.current?.click()}
             >
               <Camera className="h-4 w-4" /> Ambil Foto
@@ -88,6 +106,7 @@ export function KKUploadCard() {
               type="button"
               variant="outline"
               className="flex-1"
+              disabled={!consentChecked}
               onClick={() => fileRef.current?.click()}
             >
               <Upload className="h-4 w-4" /> Unggah Gambar
