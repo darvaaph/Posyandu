@@ -20,9 +20,10 @@ export function tentukanKategori(params: {
   jenis_kelamin: JenisKelamin;
   status_hamil?: boolean;
   punya_pasangan?: boolean; // pasangan_id terisi
+  refDate?: Date;
 }): KategoriResult {
-  const { tanggal_lahir, jenis_kelamin, status_hamil, punya_pasangan } = params;
-  const { totalBulan, tahun } = hitungUsia(tanggal_lahir);
+  const { tanggal_lahir, jenis_kelamin, status_hamil, punya_pasangan, refDate } = params;
+  const { totalBulan, tahun } = hitungUsia(tanggal_lahir, refDate);
 
   const kategori: KategoriNama[] = [];
 
@@ -93,8 +94,8 @@ export function tentukanKategori(params: {
  * Memakai hasil hitungan DB (view v_individuals) bila tersedia, agar konsisten
  * dengan sumber kebenaran di Postgres; jatuh ke perhitungan klien bila tidak.
  */
-export function kategoriIndividu(ind: Individu): KategoriResult {
-  if (ind.kategori_utama && ind.kategori_semua && ind.kategori_semua.length) {
+export function kategoriIndividu(ind: Individu, refDate?: Date): KategoriResult {
+  if (!refDate && ind.kategori_utama && ind.kategori_semua && ind.kategori_semua.length) {
     return {
       kategori_utama: ind.kategori_utama,
       semua_kategori: ind.kategori_semua,
@@ -105,11 +106,13 @@ export function kategoriIndividu(ind: Individu): KategoriResult {
     jenis_kelamin: ind.jenis_kelamin,
     status_hamil: ind.status_hamil,
     punya_pasangan: Boolean(ind.pasangan_id),
+    refDate,
   });
 }
 
 /** Apakah individu termasuk dalam sebuah kategori (untuk filter & hitung). */
-export function termasukKategori(ind: Individu, nama: KategoriNama): boolean {
+export function termasukKategori(ind: Individu, nama: KategoriNama, refDate?: Date): boolean {
   if (ind.status !== "aktif") return false;
-  return kategoriIndividu(ind).semua_kategori.includes(nama);
+  if (refDate && ind.created_at && new Date(ind.created_at) > refDate) return false;
+  return kategoriIndividu(ind, refDate).semua_kategori.includes(nama);
 }

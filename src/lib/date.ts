@@ -25,14 +25,14 @@ export function hitungUsia(tanggalLahir: string | Date, ref: Date = new Date()):
   return { tahun, bulan, totalBulan };
 }
 
-export function usiaDisplay(tanggalLahir: string | Date): string {
-  const { tahun, bulan } = hitungUsia(tanggalLahir);
+export function usiaDisplay(tanggalLahir: string | Date, ref?: Date): string {
+  const { tahun, bulan } = hitungUsia(tanggalLahir, ref);
   if (tahun <= 0) return `${bulan} bulan`;
   if (bulan === 0) return `${tahun} tahun`;
   return `${tahun} tahun ${bulan} bulan`;
 }
 
-const BULAN_ID = [
+export const BULAN_ID = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
@@ -56,4 +56,15 @@ export function formatTanggalWaktu(value?: string | Date | null): string {
 export function periodeSekarang(): string {
   const d = new Date();
   return `${BULAN_ID[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+export function parsePeriode(periodeStr: string): Date | undefined {
+  if (!periodeStr) return undefined;
+  const parts = periodeStr.split(" ");
+  if (parts.length !== 2) return undefined;
+  const [bulanStr, tahunStr] = parts;
+  const bulanIdx = BULAN_ID.indexOf(bulanStr);
+  const tahun = parseInt(tahunStr, 10);
+  if (bulanIdx === -1 || isNaN(tahun)) return undefined;
+  return new Date(tahun, bulanIdx + 1, 0, 23, 59, 59);
 }

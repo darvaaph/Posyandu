@@ -8,7 +8,7 @@ import { useDatabase } from "@/hooks/useData";
 import { store } from "@/lib/store";
 import { useNotification } from "@/contexts/NotificationContext";
 import { termasukKategori } from "@/lib/kategorisasi";
-import { usiaDisplay, periodeSekarang } from "@/lib/date";
+import { usiaDisplay, periodeSekarang, BULAN_ID } from "@/lib/date";
 import { KATEGORI_LIST } from "@/lib/constants";
 import { exportPDF, exportCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
@@ -23,20 +23,43 @@ export default function GenerateLaporanPage() {
   const { notify } = useNotification();
 
   const [kategori, setKategori] = useState<KategoriNama | "Semua">("Semua");
-  const [periode, setPeriode] = useState(periodeSekarang());
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [previewOpen, setPreviewOpen] = useState(false);
 
+  const now = useMemo(() => new Date(), []);
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  const isFuturePeriod = useMemo(() => {
+    if (selectedYear > currentYear) return true;
+    if (selectedYear === currentYear && selectedMonth > currentMonth) return true;
+    return false;
+  }, [selectedMonth, selectedYear, currentYear, currentMonth]);
+
+  const periode = useMemo(() => {
+    return `${BULAN_ID[selectedMonth]} ${selectedYear}`;
+  }, [selectedMonth, selectedYear]);
+
+  const refDate = useMemo(() => {
+    return new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59);
+  }, [selectedMonth, selectedYear]);
+
   const members = useMemo(() => {
-    if (kategori === "Semua") return db.individuals.filter((i) => i.status === "aktif");
-    return db.individuals.filter((i) => termasukKategori(i, kategori));
-  }, [db.individuals, kategori]);
+    if (kategori === "Semua") {
+      return db.individuals.filter(
+        (i) => i.status === "aktif" && (!i.created_at || new Date(i.created_at) <= refDate)
+      );
+    }
+    return db.individuals.filter((i) => termasukKategori(i, kategori, refDate));
+  }, [db.individuals, kategori, refDate]);
 
   const judul = `Laporan ${kategori} - ${periode}`;
 
   const rows = members.map((m) => [
     m.nama,
     m.nik,
-    usiaDisplay(m.tanggal_lahir),
+    usiaDisplay(m.tanggal_lahir, refDate),
     m.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan",
   ]);
 
@@ -97,22 +120,62 @@ export default function GenerateLaporanPage() {
             </Select>
           </div>
 
-          <div>
-            <Label>Periode</Label>
-            <Input value={periode} onChange={(e) => setPeriode(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Bulan</Label>
+              <Select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              >
+                {BULAN_ID.map((bln, idx) => (
+                  <option
+                    key={bln}
+                    value={idx}
+                    disabled={selectedYear === currentYear && idx > currentMonth}
+                  >
+                    {bln}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <div>
+              <Label>Tahun</Label>
+              <Select
+                value={selectedYear}
+                onChange={(e) => {
+                  const yr = Number(e.target.value);
+                  setSelectedYear(yr);
+                  if (yr === currentYear && selectedMonth > currentMonth) {
+                    setSelectedMonth(currentMonth);
+                  }
+                }}
+              >
+                {Array.from({ length: 5 }, (_, i) => currentYear - 4 + i).map((yr) => (
+                  <option key={yr} value={yr}>
+                    {yr}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
 
-          <div className="rounded-lg bg-muted/50 p-3 text-sm">
-            <p className="font-medium">{judul}</p>
-            <p className="text-muted-foreground">{members.length} data warga akan disertakan</p>
-          </div>
+          {isFuturePeriod ? (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive font-medium">
+              ⚠️ Periode tidak boleh melebihi bulan saat ini.
+            </div>
+          ) : (
+            <div className="rounded-lg bg-muted/50 p-3 text-sm">
+              <p className="font-medium">{judul}</p>
+              <p className="text-muted-foreground">{members.length} data warga akan disertakan</p>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <Button
               variant="outline"
               className="flex-1"
               onClick={() => setPreviewOpen(true)}
-              disabled={members.length === 0}
+              disabled={members.length === 0 || isFuturePeriod}
             >
               Pratinjau
             </Button>

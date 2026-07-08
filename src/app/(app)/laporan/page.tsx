@@ -7,7 +7,7 @@ import { useReports } from "@/hooks/useData";
 import { useDatabase } from "@/hooks/useData";
 import { store } from "@/lib/store";
 import { useNotification } from "@/contexts/NotificationContext";
-import { formatTanggalWaktu, usiaDisplay } from "@/lib/date";
+import { formatTanggalWaktu, usiaDisplay, parsePeriode } from "@/lib/date";
 import { termasukKategori } from "@/lib/kategorisasi";
 import { exportPDF, exportCSV } from "@/lib/export";
 import { Button } from "@/components/ui/button";
@@ -24,14 +24,17 @@ export default function LaporanPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const rowsFor = (lap: Laporan) => {
+    const refDate = parsePeriode(lap.periode);
     const members =
       lap.kategori === "Semua"
-        ? db.individuals.filter((i) => i.status === "aktif")
-        : db.individuals.filter((i) => termasukKategori(i, lap.kategori as KategoriNama));
+        ? db.individuals.filter(
+            (i) => i.status === "aktif" && (!refDate || !i.created_at || new Date(i.created_at) <= refDate)
+          )
+        : db.individuals.filter((i) => termasukKategori(i, lap.kategori as KategoriNama, refDate));
     return members.map((m) => [
       m.nama,
       m.nik,
-      usiaDisplay(m.tanggal_lahir),
+      usiaDisplay(m.tanggal_lahir, refDate),
       m.jenis_kelamin === "L" ? "L" : "P",
     ]);
   };
