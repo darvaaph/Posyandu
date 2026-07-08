@@ -115,3 +115,70 @@ CREATE POLICY "insert own reports" ON reports FOR INSERT
   WITH CHECK (kader_id IN (SELECT id FROM kader_profiles WHERE user_id = auth.uid()));
 CREATE POLICY "delete own reports" ON reports FOR DELETE
   USING (kader_id IN (SELECT id FROM kader_profiles WHERE user_id = auth.uid()));
+
+-- =========================================================
+-- 5. TRIGGER: Promosi Istri Menjadi Kepala Keluarga Otomatis
+--    ketika kepala keluarga dihapus, dinonaktifkan (pindah/meninggal),
+--    atau perannya diubah ke peran lain.
+-- =========================================================
+CREATE OR REPLACE FUNCTION handle_kepala_keluarga_absent()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_istri_id UUID;
+  v_istri_nama TEXT;
+  v_should_trigger BOOLEAN := FALSE;
+BEGIN
+  -- Cek apakah kepala keluarga dihapus atau dinonaktifkan
+  IF TG_OP = 'DELETE' THEN
+    IF OLD.peran_dalam_kk = 'kepala_keluarga' THEN
+      v_should_trigger := TRUE;
+    END IF;
+  ELSIF TG_OP = 'UPDATE' THEN
+    IF OLD.peran_dalam_kk = 'kepala_keluarga' THEN
+      -- Kasus 1: Status berubah dari aktif menjadi non-aktif (pindah/meninggal)
+      IF NEW.status IN ('pindah', 'meninggal') AND OLD.status = 'aktif' THEN
+        v_should_trigger := TRUE;
+      -- Kasus 2: Peran KK diubah dari kepala_keluarga menjadi peran lain
+      ELSIF NEW.peran_dalam_kk <> 'kepala_keluarga' THEN
+        v_should_trigger := TRUE;
+      END IF;
+    END IF;
+  END IF;
+
+  IF v_should_trigger THEN
+     -- Cari istri aktif di rumah tangga yang sama
+     SELECT id, nama INTO v_istri_id, v_istri_nama
+     FROM public.individuals
+     WHERE household_id = OLD.household_id
+       AND peran_dalam_kk = 'istri'
+       AND status = 'aktif'
+     LIMIT 1;
+
+     -- Jika ditemukan istri, promosikan menjadi kepala keluarga yang baru
+     IF v_istri_id IS NOT NULL THEN
+       -- 1. Ubah peran istri menjadi kepala_keluarga dan putus pasangan
+       UPDATE public.individuals
+       SET peran_dalam_kk = 'kepala_keluarga',
+           pasangan_id = NULL
+       WHERE id = v_istri_id;
+
+       -- 2. Perbarui kolom nama_kepala_keluarga di tabel households
+       UPDATE public.households
+       SET nama_kepala_keluarga = v_istri_nama
+       WHERE id = OLD.household_id;
+     END IF;
+  END IF;
+
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  ELSE
+    RETURN NEW;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tr_kepala_keluarga_absent ON public.individuals;
+CREATE TRIGGER tr_kepala_keluarga_absent
+AFTER DELETE OR UPDATE ON public.individuals
+FOR EACH ROW
+EXECUTE FUNCTION handle_kepala_keluarga_absent();
