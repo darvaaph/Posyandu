@@ -12,16 +12,6 @@ import { KategoriBadge } from "@/components/cards/KategoriCard";
 import { ArrowRight } from "lucide-react";
 import type { KategoriNama } from "@/lib/types";
 
-function BadgeKategori({ nama }: { nama: KategoriNama | undefined | null }) {
-  if (!nama) {
-    return (
-      <span className="rounded-full bg-muted px-2.5 py-0.5 text-muted-foreground">
-        Baru
-      </span>
-    );
-  }
-  return <KategoriBadge nama={nama} />;
-}
 
 export default function TinjauanPage() {
   const reviews = useReviews();
@@ -104,14 +94,31 @@ export default function TinjauanPage() {
                 <p className="font-medium">{r.nama}</p>
                 <p className="text-xs text-muted-foreground">{r.usia_display}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs">
-                  <BadgeKategori nama={r.kategori_lama} />
-                  <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-                  {r.kategori_baru ? (
-                    <KategoriBadge nama={r.kategori_baru} />
+                  {r.kategori_lama ? (
+                    <>
+                      <KategoriBadge nama={r.kategori_lama} />
+                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                      {r.kategori_baru ? (
+                        <KategoriBadge nama={r.kategori_baru} />
+                      ) : (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-slate-500">
+                          Tidak ada kategori sasaran
+                        </span>
+                      )}
+                    </>
                   ) : (
-                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-slate-500">
-                      Tidak ada kategori sasaran
-                    </span>
+                    <>
+                      {r.kategori_baru ? (
+                        <KategoriBadge nama={r.kategori_baru} />
+                      ) : (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-slate-500">
+                          Tidak ada kategori sasaran
+                        </span>
+                      )}
+                      <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-medium text-blue-700 border border-blue-100">
+                        Pendaftaran Baru
+                      </span>
+                    </>
                   )}
                 </div>
               </div>
